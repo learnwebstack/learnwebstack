@@ -17,14 +17,17 @@ import {
   Printer,
   Share2,
   Check,
+  PartyPopper,
+  Trophy,
 } from "lucide-react";
 import type { DayContent } from "@/data/types";
-import { getAdjacentDays } from "@/data/days";
+import { getAdjacentDays, allDays } from "@/data/days";
 import { SectionRenderer } from "./section-renderer";
 import { TableOfContents } from "./table-of-contents";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
 interface DayViewProps {
@@ -46,6 +49,25 @@ export function DayView({
   const isCompleted = completedDays.has(day.day);
   const [bookmarked, setBookmarked] = React.useState(false);
   const [shared, setShared] = React.useState(false);
+  const { toast } = useToast();
+
+  const handleToggleComplete = () => {
+    const willComplete = !isCompleted;
+    onToggleComplete(day.day);
+    if (willComplete) {
+      const completedCount = completedDays.size + 1;
+      const isAllDone = completedCount === allDays.length;
+      toast({
+        title: isAllDone ? "Course Complete! 🎉" : "Day marked complete!",
+        description: isAllDone
+          ? `Congratulations! You've completed all ${allDays.length} days of the Full Stack Web Development course.`
+          : `Great progress! ${completedCount} of ${allDays.length} days completed (${Math.round(
+              (completedCount / allDays.length) * 100
+            )}%).`,
+        duration: 5000,
+      });
+    }
+  };
 
   // Estimate reading time from content word count (~200 wpm)
   const readingTime = React.useMemo(() => {
@@ -180,9 +202,13 @@ export function DayView({
               <Button
                 size="sm"
                 variant={isCompleted ? "default" : "outline"}
-                onClick={() => onToggleComplete(day.day)}
+                onClick={handleToggleComplete}
               >
-                <CheckCircle2 className="h-4 w-4" />
+                {isCompleted ? (
+                  <CheckCircle2 className="h-4 w-4" />
+                ) : (
+                  <PartyPopper className="h-4 w-4" />
+                )}
                 {isCompleted ? "Completed" : "Mark as Complete"}
               </Button>
               <Button
@@ -307,21 +333,23 @@ export function DayView({
           </div>
 
           {/* Key takeaways */}
-          <div className="my-10 rounded-xl border-l-4 border-primary bg-primary/5 p-5">
-            <div className="mb-3 flex items-center gap-2">
-              <Target className="h-5 w-5 text-primary" />
+          <div className="my-10 overflow-hidden rounded-xl border-l-4 border-primary bg-gradient-to-br from-primary/5 to-chart-2/5 p-6 shadow-sm">
+            <div className="mb-4 flex items-center gap-2">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <Target className="h-4 w-4 text-primary" />
+              </div>
               <h3 className="text-lg font-bold">Key Takeaways</h3>
             </div>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {day.keyTakeaways.map((takeaway, i) => (
                 <li
                   key={i}
-                  className="flex items-start gap-2 text-sm text-foreground"
+                  className="flex items-start gap-3 text-sm text-foreground leading-relaxed"
                 >
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-chart-2 text-xs font-bold text-primary-foreground shadow-sm">
                     {i + 1}
                   </span>
-                  {takeaway}
+                  <span>{takeaway}</span>
                 </li>
               ))}
             </ul>
@@ -330,14 +358,19 @@ export function DayView({
           {/* Exercises */}
           <div className="my-10">
             <div className="mb-4 flex items-center gap-2">
-              <ListTodo className="h-5 w-5 text-primary" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <ListTodo className="h-4 w-4 text-primary" />
+              </div>
               <h3 className="text-lg font-bold">Practice Exercises</h3>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {day.exercises.map((exercise, i) => (
-                <Card key={i} className="p-4 transition-shadow hover:shadow-md">
+                <Card
+                  key={i}
+                  className="group p-4 transition-all hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                >
                   <div className="flex items-start gap-3">
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                       {i + 1}
                     </span>
                     <p className="text-sm text-muted-foreground leading-relaxed">

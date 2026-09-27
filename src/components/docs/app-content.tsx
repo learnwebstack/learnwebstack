@@ -102,6 +102,25 @@ export function AppContent() {
         setShortcutsOpen((prev) => !prev);
         return;
       }
+      // J → focus the Jump to Day dropdown (home page only)
+      if (
+        e.key === "j" &&
+        !isTyping &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey &&
+        !currentDay
+      ) {
+        e.preventDefault();
+        const trigger = document.getElementById(
+          "jump-to-day"
+        ) as HTMLButtonElement | null;
+        if (trigger) {
+          trigger.focus();
+          trigger.click();
+        }
+        return;
+      }
       // g then h → home; g then ←/→ → prev/next day
       if (!isTyping && !e.metaKey && !e.ctrlKey && !e.altKey) {
         if (e.key === "g" || e.key === "G") {

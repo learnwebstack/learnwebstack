@@ -379,7 +379,10 @@ export function HomePage({
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Jump to:</span>
             <Select onValueChange={(val) => onSelectDay(parseInt(val, 10))}>
-              <SelectTrigger className="h-9 w-[220px] gap-2 text-sm">
+              <SelectTrigger
+                id="jump-to-day"
+                className="h-9 w-[220px] gap-2 text-sm"
+              >
                 <SelectValue placeholder="Select a day..." />
               </SelectTrigger>
               <SelectContent className="max-h-80">
@@ -393,6 +396,9 @@ export function HomePage({
                 ))}
               </SelectContent>
             </Select>
+            <kbd className="hidden rounded border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground sm:inline-block">
+              J
+            </kbd>
           </div>
         </div>
 

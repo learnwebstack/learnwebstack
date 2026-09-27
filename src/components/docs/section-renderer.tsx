@@ -4,6 +4,7 @@ import * as React from "react";
 import type { ContentSection } from "@/data/types";
 import { CodeBlock } from "./code-block";
 import { Callout } from "./callout";
+import { SectionHeading } from "./section-heading";
 import { cn } from "@/lib/utils";
 
 export function SectionRenderer({ section }: { section: ContentSection }) {
@@ -11,23 +12,11 @@ export function SectionRenderer({ section }: { section: ContentSection }) {
 
   return (
     <section id={headingId} className="scroll-mt-24">
-      {section.level === 3 ? (
-        <h3 className="group flex items-center gap-2 text-xl font-semibold tracking-tight mt-8 mb-3">
-          <span className="h-4 w-1 rounded-full bg-primary/50" />
-          {section.heading}
-        </h3>
-      ) : (
-        <h2 className="group flex items-center gap-2 text-2xl font-bold tracking-tight mt-12 mb-4 border-b pb-2">
-          {section.heading}
-          <a
-            href={`#${headingId}`}
-            className="opacity-0 transition-opacity group-hover:opacity-100 text-primary"
-            aria-label={`Link to ${section.heading}`}
-          >
-            #
-          </a>
-        </h2>
-      )}
+      <SectionHeading
+        id={headingId}
+        heading={section.heading}
+        level={section.level}
+      />
 
       {section.paragraphs?.map((para, i) => (
         <p key={i} className="mb-4 leading-7 text-muted-foreground">

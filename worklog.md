@@ -379,3 +379,58 @@ The project is a 17-day Full Stack Web Development documentation website (Next.j
   4. Add a "copy link to section" feature on section headings (the # anchor link currently just navigates)
   5. Add a progress celebration animation/toast when completing a day (confetti or success message)
   6. Consider adding a dark-mode-specific OG image for users who share from dark mode
+
+---
+Task ID: CRON-5
+Agent: Z.ai Code (cron webDevReview round 5)
+Task: QA verification + celebration toast, copy-link-to-section, J shortcut, key takeaways/exercises styling polish
+
+## Current Project Status Description / Assessment
+The project is a 17-day Full Stack Web Development documentation website (Next.js 16 + TypeScript + Tailwind + shadcn/ui). At the start of this round, the site was fully stable: ESLint clean, all routes 200, no runtime errors, with 25 features already implemented across CRON-1 through CRON-4. The phase was stable, so this round implemented the next-phase recommendations from CRON-4: progress celebration, copy-link-to-section, J keyboard shortcut, and key takeaways/exercises styling polish.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### QA Findings (via agent-browser)
+- Home page: 17 cards, 3 tier headers, no console errors ✓
+- Day pages: 6 code blocks, 6 section anchors, key takeaways present ✓
+- ESLint: 0 errors ✓
+- All routes (/, /?day=1, /?day=5, /?day=9, /?day=17, /sitemap.xml, /og-image.png, SVGs): 200 ✓
+- No regressions from previous rounds
+
+### New Features Added
+1. **Progress celebration toast** — When a user marks a day as complete, a celebratory toast notification appears (using the existing useToast hook + Toaster). Shows "Day marked complete!" with progress stats ("Great progress! X of 17 days completed (Y%)"). Has a special "Course Complete! 🎉" message when the final day is completed. Toast auto-dismisses after 5 seconds. The "Mark as Complete" button now shows a PartyPopper icon (instead of CheckCircle2) when uncompleted, for a more celebratory feel.
+
+2. **Copy-link-to-section** — Each section heading (h2 and h3) now has a link icon button (Link2) that appears on hover. Clicking it copies the full URL with the section anchor (#section-id) to the clipboard, shows a toast confirmation ("Link copied! Section link copied to clipboard"), and updates the browser URL hash via replaceState (no scroll jump). Shows a green Check icon for 2 seconds after copy. The icon is keyboard-focusable with proper aria-label.
+
+3. **J keyboard shortcut for Jump to Day** — Pressing "J" on the home page (when not typing and not on a day page) focuses and opens the Jump to Day Select dropdown, enabling keyboard-only day navigation. Added a `<kbd>J</kbd>` hint badge next to the dropdown. Also added "Jump to day (home only)" entry to the keyboard shortcuts help modal with a ListOrdered icon.
+
+### Styling Improvements
+- **Key Takeaways section**: upgraded from flat `bg-primary/5` to a gradient `bg-gradient-to-br from-primary/5 to-chart-2/5` with `shadow-sm`, `p-6` (was p-5), icon now in a rounded `bg-primary/10` container (8×8), takeaway numbers now use gradient circles `bg-gradient-to-br from-primary to-chart-2` with shadow, increased spacing (space-y-2→space-y-3) and line-height
+- **Practice Exercises section**: icon now in rounded `bg-primary/10` container, exercise cards now have `hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md` lift effect, number badges transition to `bg-primary text-primary-foreground` on card hover (filled solid)
+- **Section headings**: replaced inline `#` text anchor with a dedicated SectionHeading component using a Link2 icon button with toast feedback; h3 headings now use the component too (was inline)
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=5, /?day=9, /?day=17, /sitemap.xml, /og-image.png, SVG assets ✓
+- agent-browser feature verification:
+  * Copy-link buttons: 6 per day page (one per section) ✓
+  * Key takeaways gradient background present ✓
+  * Exercise cards with hover: 6 ✓
+  * PartyPopper icon on Mark as Complete button ✓
+  * Celebration toast appeared on mark complete: "Day marked complete! Great progress! 1 of 17 days completed (5%)" ✓
+  * Jump to Day kbd hint present, select has id="jump-to-day" ✓
+  * Shortcuts help dialog lists "Jump to day (home only)" with J ✓
+- VLM assessment: 9/10 polish — "Key Takeaways and Practice Exercises visually polished with distinct gradient backgrounds; section headings equipped with copy-link icons; clean typography, well-organized code blocks, effective use of color-coded callout boxes" ✓
+- No console errors during navigation ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — all features from CRON-1 through CRON-5 work correctly with no regressions
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
+- Author name "Ketan Kore" remains intentionally absent per user request
+- **Recommended next-phase priorities**:
+  1. Add a dedicated course overview page with a full table of contents listing all 17 days' topics in one view (improves SEO and discoverability)
+  2. Add scroll-spy to highlight the current day in the sidebar based on scroll position within long day pages
+  3. Add a dark-mode-specific OG image for users who share from dark mode
+  4. Add a "search within day" feature (filter sections in the TOC by keyword)
+  5. Add a "last visited" timestamp display on the Continue Reading cards
+  6. Consider adding a course completion certificate/downloadable summary when all 17 days are done
