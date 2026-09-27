@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://fullstack-docs.example.com/sitemap.xml
+Sitemap: https://learnwebstack.vercel.app/sitemap.xml

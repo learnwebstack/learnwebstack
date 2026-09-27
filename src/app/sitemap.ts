@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { allDays } from "@/data/days";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://fullstack-docs.example.com";
+  const baseUrl = "https://learnwebstack.vercel.app";
 
   const entries: MetadataRoute.Sitemap = [
     {

@@ -1,18 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { Search, Menu, BookOpen, Github, Home, Keyboard } from "lucide-react";
+import { Search, Menu, BookOpen, Github, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { FontSizeControl } from "@/components/docs/font-size-control";
-import { Badge } from "@/components/ui/badge";
 import { courseStats } from "@/data/days";
 
 interface HeaderProps {
   onSearchOpen: () => void;
   onMenuToggle: () => void;
   onHomeClick: () => void;
-  onShortcutsOpen: () => void;
   showMenuButton: boolean;
 }
 
@@ -20,7 +17,6 @@ export function Header({
   onSearchOpen,
   onMenuToggle,
   onHomeClick,
-  onShortcutsOpen,
   showMenuButton,
 }: HeaderProps) {
   return (
@@ -79,17 +75,7 @@ export function Header({
           >
             <Home className="h-4 w-4" />
           </Button>
-          <FontSizeControl />
           <ThemeToggle />
-          <Button
-            variant="ghost"
-            size="icon"
-            className="hidden h-9 w-9 sm:inline-flex"
-            onClick={onShortcutsOpen}
-            aria-label="Keyboard shortcuts"
-          >
-            <Keyboard className="h-4 w-4" />
-          </Button>
           <Button
             variant="ghost"
             size="icon"
@@ -97,7 +83,7 @@ export function Header({
             asChild
           >
             <a
-              href="https://github.com"
+              href="https://github.com/akram6t/learnwebstack"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"

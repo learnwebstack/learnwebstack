@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = "https://fullstack-docs.example.com";
+const siteUrl = "https://learnwebstack.vercel.app";
 const siteName = "Full Stack Web Development — Complete Course Notes";
+const githubUrl = "https://github.com/akram6t/learnwebstack";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -38,9 +39,12 @@ export const metadata: Metadata = {
     "coding bootcamp",
     "frontend development",
     "backend development",
+    "learn web development",
+    "learnwebstack",
   ],
-  authors: [{ name: "Course Notes" }],
-  creator: "Course Notes",
+  authors: [{ name: "akram6t", url: "https://github.com/akram6t" }],
+  creator: "akram6t",
+  publisher: "learnwebstack",
   openGraph: {
     type: "website",
     locale: "en_US",

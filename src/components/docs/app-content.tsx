@@ -245,7 +245,6 @@ export function AppContent() {
         onSearchOpen={() => setSearchOpen(true)}
         onMenuToggle={() => setSidebarOpen(true)}
         onHomeClick={goHome}
-        onShortcutsOpen={() => setShortcutsOpen(true)}
         showMenuButton={!!selectedDay}
       />
 
