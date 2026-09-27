@@ -172,6 +172,15 @@ export function AppContent() {
         ) as number[];
         const updated = [day, ...stored.filter((d) => d !== day)].slice(0, 8);
         localStorage.setItem("recent-days", JSON.stringify(updated));
+        // Store visit timestamp
+        const timestamps = JSON.parse(
+          localStorage.getItem("recent-days-timestamps") || "{}"
+        ) as Record<number, number>;
+        timestamps[day] = Date.now();
+        localStorage.setItem(
+          "recent-days-timestamps",
+          JSON.stringify(timestamps)
+        );
         window.dispatchEvent(new Event("recent-days-changed"));
       } catch {
         /* noop */

@@ -385,20 +385,26 @@ export function DayView({
           {/* Resources */}
           <div className="my-10">
             <div className="mb-4 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
+                <BookOpen className="h-4 w-4 text-primary" />
+              </div>
               <h3 className="text-lg font-bold">Additional Resources</h3>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {day.resources.map((resource, i) => (
                 <a
                   key={i}
                   href={resource.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group flex items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium transition-all hover:border-primary hover:shadow-sm"
+                  className="group flex items-center gap-3 rounded-xl border bg-card p-4 text-sm font-medium transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-md"
                 >
-                  <ExternalLink className="h-3.5 w-3.5 text-muted-foreground group-hover:text-primary" />
-                  {resource.label}
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                    <ExternalLink className="h-3.5 w-3.5 text-primary group-hover:text-primary-foreground" />
+                  </div>
+                  <span className="min-w-0 flex-1 truncate group-hover:text-primary">
+                    {resource.label}
+                  </span>
                 </a>
               ))}
             </div>
@@ -409,15 +415,15 @@ export function DayView({
             {previous ? (
               <button
                 onClick={() => onNavigate(previous.day)}
-                className="group flex flex-col items-start gap-1 rounded-xl border p-4 text-left transition-all hover:border-primary hover:shadow-sm"
+                className="group flex flex-col items-start gap-1 rounded-xl border bg-card p-5 text-left transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-md"
               >
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <ArrowLeft className="h-3 w-3" /> Previous
+                <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                  <ArrowLeft className="h-3 w-3 transition-transform group-hover:-translate-x-0.5" /> Previous Day
                 </span>
                 <span className="font-mono text-xs text-muted-foreground">
                   {previous.date}
                 </span>
-                <span className="font-medium group-hover:text-primary">
+                <span className="font-medium group-hover:text-primary line-clamp-2">
                   {previous.title}
                 </span>
               </button>
@@ -427,10 +433,10 @@ export function DayView({
             {next ? (
               <button
                 onClick={() => onNavigate(next.day)}
-                className="group flex flex-col items-end gap-1 rounded-xl border p-4 text-right transition-all hover:border-primary hover:shadow-sm"
+                className="group flex flex-col items-end gap-1 rounded-xl border bg-card p-5 text-right transition-all hover:-translate-y-0.5 hover:border-primary hover:shadow-md"
               >
-                <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                  Next <ArrowRight className="h-3 w-3" />
+                <span className="flex items-center gap-1 text-xs font-medium text-muted-foreground">
+                  Next Day <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                 </span>
                 <span className="font-mono text-xs text-muted-foreground">
                   {next.date}

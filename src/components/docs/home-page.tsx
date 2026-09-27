@@ -69,6 +69,8 @@ export function HomePage({
 
   // Recently viewed days (localStorage history)
   const [recentDays, setRecentDays] = React.useState<number[]>([]);
+  // Visit timestamps for recently viewed days
+  const [timestamps, setTimestamps] = React.useState<Record<number, number>>({});
   // Bookmarked days (localStorage)
   const [bookmarkedDays, setBookmarkedDays] = React.useState<number[]>([]);
 
@@ -76,6 +78,8 @@ export function HomePage({
     try {
       const recent = JSON.parse(localStorage.getItem("recent-days") || "[]") as number[];
       setRecentDays(recent);
+      const ts = JSON.parse(localStorage.getItem("recent-days-timestamps") || "{}") as Record<number, number>;
+      setTimestamps(ts);
     } catch {
       /* noop */
     }
@@ -92,6 +96,8 @@ export function HomePage({
       try {
         const recent = JSON.parse(localStorage.getItem("recent-days") || "[]") as number[];
         setRecentDays(recent);
+        const ts = JSON.parse(localStorage.getItem("recent-days-timestamps") || "{}") as Record<number, number>;
+        setTimestamps(ts);
       } catch {
         /* noop */
       }
@@ -113,6 +119,19 @@ export function HomePage({
       window.removeEventListener("storage", handleStorageChange);
     };
   }, []);
+
+  // Helper: format a timestamp as relative time (e.g., "2m ago", "1h ago", "3d ago")
+  const formatRelativeTime = (ts: number): string => {
+    const diff = Date.now() - ts;
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "just now";
+    if (minutes < 60) return `${minutes}m ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days}d ago`;
+    return new Date(ts).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  };
 
   // Difficulty tiers with day ranges
   const tiers = [
@@ -290,6 +309,7 @@ export function HomePage({
                     {recentDayObjects.map((day) => {
                       const d = day!;
                       const isCompleted = completedDays.has(d.day);
+                      const visitedAt = timestamps[d.day];
                       return (
                         <button
                           key={d.day}
@@ -303,8 +323,17 @@ export function HomePage({
                             <p className="truncate text-sm font-medium group-hover:text-primary">
                               {d.title}
                             </p>
-                            <p className="truncate text-xs text-muted-foreground">
-                              {d.category}
+                            <p className="flex items-center gap-1.5 truncate text-xs text-muted-foreground">
+                              <span>{d.category}</span>
+                              {visitedAt && (
+                                <>
+                                  <span>·</span>
+                                  <span className="inline-flex items-center gap-0.5">
+                                    <Clock className="h-2.5 w-2.5" />
+                                    {formatRelativeTime(visitedAt)}
+                                  </span>
+                                </>
+                              )}
                             </p>
                           </div>
                           {isCompleted && (
