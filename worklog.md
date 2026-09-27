@@ -731,3 +731,42 @@ User requested removing the "background effect like light effect on each line of
 - **No unresolved bugs** — code blocks now render as plain monochrome text per user request
 - The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
 - Author name "Ketan Kore" remains intentionally absent per user request
+
+---
+Task ID: USER-2
+Agent: Z.ai Code
+Task: Restore syntax highlighting colors but remove only the per-line background/light effect
+
+## Current Project Status Description / Assessment
+User clarified the previous request: they want the syntax highlighting colors back (the "extension color theme" — green strings, purple keywords, etc.) but ONLY the per-line background/light effect removed (the text shadow `0 1px rgba(0,0,0,0.3)` from the oneDark theme and any line background). The previous round (USER-1) had removed ALL syntax highlighting, which was too much.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### Changes Made
+- Restored `react-syntax-highlighter` with Prism's `oneDark`/`oneLight` themes in `/src/components/docs/code-block.tsx`
+- Created a `themeOverride` that spreads the base theme but explicitly removes the per-line background and text shadow:
+  - `pre[class*="language-"]`: `background: "transparent"`, `textShadow: "none"`
+  - `code[class*="language-"]`: `background: "transparent"`, `textShadow: "none"`, custom text color
+  - `customStyle`: `background: "transparent"`, `textShadow: "none"`
+  - `codeTagProps`: `background: "transparent"`, `textShadow: "none"`
+  - `lineNumberStyle`: `background: "transparent"`
+  - Selection backgrounds kept subtle
+- All syntax token colors (keywords, strings, numbers, comments, functions, etc.) from the oneDark/oneLight themes are preserved
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=3, /?day=7, /?day=13, /?day=17 ✓
+- DOM verification (Day 7): 622 token spans with 4+ distinct colors:
+  - `rgb(160, 161, 167)` — grey (comments)
+  - `rgb(166, 38, 164)` — purple (keywords like const/let/var)
+  - `rgb(183, 107, 1)` — amber (numbers like 3.14159)
+  - `rgb(64, 120, 242)` — blue (functions/variables)
+- DOM verification (Day 3 CSS): 520 token spans with 5 distinct colors (grey, dark, red, amber, green)
+- VLM confirmed (Day 7, dark mode): "const=Purple, PI=White, 3.14159=Orange, 'Hello world'=Green; background uniform, no per-line background, no text shadow"
+- VLM confirmed (Day 3, light mode): "Selectors=Green, Properties=Red, Values=Dark Blue, Strings=Reddish-brown, Comments=Gray; background uniform, no text shadow, text is flat and crisp"
+- No console errors ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — code blocks now have syntax highlighting colors with no per-line background/light effect, exactly as user requested
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
+- Author name "Ketan Kore" remains intentionally absent per user request

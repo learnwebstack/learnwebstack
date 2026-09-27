@@ -1,6 +1,11 @@
 "use client";
 
 import * as React from "react";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import {
+  oneDark,
+  oneLight,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Check, Copy, Download, Terminal } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -72,15 +77,51 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
     URL.revokeObjectURL(url);
   };
 
+  const lang = language === "text" || language === "bash" ? "bash" : language;
   const label = languageLabels[language] || language.toUpperCase();
   const badgeColor = languageColors[language] || languageColors.text;
   const isTerminal = language === "bash" || language === "text";
-  const isDark = resolvedTheme === "dark";
 
-  // Plain monochrome code — no syntax highlighting colors per token
-  const codeColor = isDark ? "#e2e8f0" : "#1e293b";
-  const showLineNumbers = code.split("\n").length > 4;
-  const lines = code.split("\n");
+  // Custom style: no per-line background, no text shadow (the "light effect")
+  const customStyle = {
+    margin: 0,
+    padding: "1.125rem 1.25rem",
+    background: "transparent",
+    fontSize: "0.8125rem",
+    lineHeight: "1.75",
+    textShadow: "none",
+  };
+
+  // Theme override: keep syntax token colors but remove line backgrounds and text shadows
+  const baseTheme = resolvedTheme === "dark" ? oneDark : oneLight;
+  const themeOverride = {
+    ...baseTheme,
+    // Remove the pre background and text shadow (the "light effect on each line")
+    'pre[class*="language-"]': {
+      ...baseTheme['pre[class*="language-"]'],
+      background: "transparent",
+      textShadow: "none",
+    },
+    // Remove the code text shadow too
+    'code[class*="language-"]': {
+      ...baseTheme['code[class*="language-"]'],
+      background: "transparent",
+      textShadow: "none",
+      color: resolvedTheme === "dark" ? "#e2e8f0" : "#1e293b",
+      fontFamily: "var(--font-geist-mono), monospace",
+    },
+    // Selection background kept subtle
+    'pre[class*="language-"] *::selection': {
+      background: resolvedTheme === "dark" ? "hsl(220, 13%, 28%)" : "hsl(220, 13%, 80%)",
+      color: "inherit",
+      textShadow: "none",
+    },
+    'code[class*="language-"]::selection': {
+      background: resolvedTheme === "dark" ? "hsl(220, 13%, 28%)" : "hsl(220, 13%, 80%)",
+      color: "inherit",
+      textShadow: "none",
+    },
+  };
 
   return (
     <div className="group relative my-6 overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-md">
@@ -138,43 +179,32 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
           </Button>
         </div>
       </div>
-      {/* Code — plain monochrome, no per-line background effects */}
+      {/* Code — with syntax highlighting colors, but NO line background / text shadow */}
       <div className="overflow-x-auto scrollbar-thin">
-        <pre
-          className="m-0 p-[1.125rem_1.25rem] text-[0.8125rem] leading-[1.75]"
-          style={{ background: "transparent" }}
-        >
-          <code
-            className="font-mono"
-            style={{
+        <SyntaxHighlighter
+          language={lang}
+          style={themeOverride}
+          customStyle={customStyle}
+          codeTagProps={{
+            style: {
               fontFamily: "var(--font-geist-mono), monospace",
-              color: codeColor,
               background: "transparent",
-            }}
-          >
-            {showLineNumbers ? (
-              lines.map((line, i) => (
-                <span key={i} className="table-row">
-                  <span
-                    className="table-cell select-none pr-[1.25em] text-right"
-                    style={{
-                      color: "var(--muted-foreground)",
-                      opacity: 0.4,
-                      minWidth: "2.5em",
-                    }}
-                  >
-                    {i + 1}
-                  </span>
-                  <span className="table-cell whitespace-pre">
-                    {line || " "}
-                  </span>
-                </span>
-              ))
-            ) : (
-              <span className="whitespace-pre">{code}</span>
-            )}
-          </code>
-        </pre>
+              textShadow: "none",
+            },
+          }}
+          showLineNumbers={code.split("\n").length > 4}
+          lineNumberStyle={{
+            color: "var(--muted-foreground)",
+            opacity: 0.4,
+            paddingRight: "1.25em",
+            minWidth: "2.5em",
+            userSelect: "none",
+            background: "transparent",
+          }}
+          wrapLongLines={false}
+        >
+          {code}
+        </SyntaxHighlighter>
       </div>
     </div>
   );
