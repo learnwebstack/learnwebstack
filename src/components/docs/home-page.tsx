@@ -10,6 +10,7 @@ import {
   Search,
   Moon,
   Bookmark,
+  BookmarkCheck,
   GraduationCap,
   Layers,
   FileCode,
@@ -17,11 +18,20 @@ import {
   Clock,
   Tag,
   Sparkles,
+  History,
+  ChevronDown,
 } from "lucide-react";
-import { allDays, courseStats } from "@/data/days";
+import { allDays, courseStats, getDayByNumber } from "@/data/days";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 interface HomePageProps {
@@ -57,12 +67,74 @@ export function HomePage({
 }: HomePageProps) {
   const progress = Math.round((completedDays.size / allDays.length) * 100);
 
+  // Recently viewed days (localStorage history)
+  const [recentDays, setRecentDays] = React.useState<number[]>([]);
+  // Bookmarked days (localStorage)
+  const [bookmarkedDays, setBookmarkedDays] = React.useState<number[]>([]);
+
+  React.useEffect(() => {
+    try {
+      const recent = JSON.parse(localStorage.getItem("recent-days") || "[]") as number[];
+      setRecentDays(recent);
+    } catch {
+      /* noop */
+    }
+    // Collect all bookmarked days
+    const bookmarks: number[] = [];
+    for (let d = 1; d <= allDays.length; d++) {
+      if (localStorage.getItem(`bookmark-day-${d}`) === "true") {
+        bookmarks.push(d);
+      }
+    }
+    setBookmarkedDays(bookmarks);
+
+    const handleStorageChange = () => {
+      try {
+        const recent = JSON.parse(localStorage.getItem("recent-days") || "[]") as number[];
+        setRecentDays(recent);
+      } catch {
+        /* noop */
+      }
+      const b: number[] = [];
+      for (let d = 1; d <= allDays.length; d++) {
+        if (localStorage.getItem(`bookmark-day-${d}`) === "true") {
+          b.push(d);
+        }
+      }
+      setBookmarkedDays(b);
+    };
+
+    window.addEventListener("bookmark-changed", handleStorageChange);
+    window.addEventListener("recent-days-changed", handleStorageChange);
+    window.addEventListener("storage", handleStorageChange);
+    return () => {
+      window.removeEventListener("bookmark-changed", handleStorageChange);
+      window.removeEventListener("recent-days-changed", handleStorageChange);
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+  // Difficulty tiers with day ranges
+  const tiers = [
+    { name: "Beginner", range: [1, 6], color: "from-emerald-500 to-green-500", textColor: "text-emerald-600 dark:text-emerald-400", icon: Sparkles },
+    { name: "Intermediate", range: [7, 12], color: "from-amber-500 to-orange-500", textColor: "text-amber-600 dark:text-amber-400", icon: Zap },
+    { name: "Advanced", range: [13, 17], color: "from-rose-500 to-fuchsia-500", textColor: "text-rose-600 dark:text-rose-400", icon: GraduationCap },
+  ];
+
+  const recentDayObjects = recentDays
+    .slice(0, 4)
+    .map((d) => getDayByNumber(d))
+    .filter(Boolean);
+  const bookmarkedDayObjects = bookmarkedDays
+    .map((d) => getDayByNumber(d))
+    .filter(Boolean);
+
   return (
     <div>
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b">
         {/* Background pattern */}
-        <div className="absolute inset-0 grid-pattern opacity-50" />
+        <div className="absolute inset-0 grid-pattern opacity-40" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
         <div className="absolute -top-24 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
 
@@ -93,7 +165,13 @@ export function HomePage({
               <Button
                 size="lg"
                 className="h-12 gap-2 px-6 text-base"
-                onClick={() => onSelectDay(completedDays.size > 0 ? Math.min(...Array.from(completedDays).map(d => d + 1)) : 1)}
+                onClick={() =>
+                  onSelectDay(
+                    completedDays.size > 0
+                      ? Math.min(...Array.from(completedDays).map((d) => d + 1))
+                      : 1
+                  )
+                }
               >
                 {completedDays.size > 0 ? "Continue Learning" : "Start Learning"}
                 <ArrowRight className="h-4 w-4" />
@@ -136,7 +214,10 @@ export function HomePage({
               { icon: Target, label: "Topics", value: courseStats.totalTopics },
               { icon: FileCode, label: "Exercises", value: courseStats.totalExercises },
             ].map((stat, i) => (
-              <Card key={i} className="p-5 text-center">
+              <Card
+                key={i}
+                className="p-5 text-center transition-all hover:shadow-md hover:-translate-y-0.5"
+              >
                 <stat.icon className="mx-auto mb-2 h-5 w-5 text-primary" />
                 <p className="text-2xl font-bold">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.label}</p>
@@ -172,7 +253,7 @@ export function HomePage({
                 desc: "Mark days as complete",
               },
             ].map((feature, i) => (
-              <div key={i} className="flex items-start gap-3">
+              <div key={i} className="flex items-start gap-3 transition-transform hover:translate-x-0.5">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                   <feature.icon className="h-5 w-5 text-primary" />
                 </div>
@@ -186,116 +267,273 @@ export function HomePage({
         </div>
       </section>
 
+      {/* Continue Reading + Bookmarks (only when user has activity) */}
+      {(recentDayObjects.length > 0 || bookmarkedDayObjects.length > 0) && (
+        <section className="border-b bg-muted/10">
+          <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+            <div className="grid gap-8 lg:grid-cols-2">
+              {/* Continue Reading */}
+              {recentDayObjects.length > 0 && (
+                <div>
+                  <div className="mb-4 flex items-center gap-2">
+                    <History className="h-4 w-4 text-primary" />
+                    <h3 className="text-sm font-semibold uppercase tracking-wider">
+                      Continue Reading
+                    </h3>
+                  </div>
+                  <div className="space-y-2">
+                    {recentDayObjects.map((day) => {
+                      const d = day!;
+                      const isCompleted = completedDays.has(d.day);
+                      return (
+                        <button
+                          key={d.day}
+                          onClick={() => onSelectDay(d.day)}
+                          className="group flex w-full items-center gap-3 rounded-lg border bg-card p-3 text-left transition-all hover:border-primary hover:shadow-sm"
+                        >
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 font-mono text-xs font-bold text-primary">
+                            {String(d.day).padStart(2, "0")}
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium group-hover:text-primary">
+                              {d.title}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground">
+                              {d.category}
+                            </p>
+                          </div>
+                          {isCompleted && (
+                            <CheckCircle2 className="h-4 w-4 shrink-0 text-primary" />
+                          )}
+                          <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Bookmarks */}
+              {bookmarkedDayObjects.length > 0 && (
+                <div>
+                  <div className="mb-4 flex items-center gap-2">
+                    <BookmarkCheck className="h-4 w-4 text-primary" />
+                    <h3 className="text-sm font-semibold uppercase tracking-wider">
+                      Your Bookmarks
+                    </h3>
+                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      {bookmarkedDayObjects.length}
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {bookmarkedDayObjects.map((day) => {
+                      const d = day!;
+                      return (
+                        <button
+                          key={d.day}
+                          onClick={() => onSelectDay(d.day)}
+                          className="group flex w-full items-center gap-3 rounded-lg border bg-card p-3 text-left transition-all hover:border-primary hover:shadow-sm"
+                        >
+                          <BookmarkCheck className="h-4 w-4 shrink-0 text-primary" />
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium group-hover:text-primary">
+                              {d.title}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground">
+                              {d.date} · {d.duration}
+                            </p>
+                          </div>
+                          <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Course Curriculum */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="mb-10 text-center">
-          <Badge variant="outline" className="mb-3 gap-1.5">
+        <div className="mb-10 flex flex-col items-center gap-4 text-center">
+          <Badge variant="outline" className="gap-1.5">
             <GraduationCap className="h-3 w-3" />
             Curriculum
           </Badge>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Day-by-Day Learning Path
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
+          <p className="mx-auto max-w-2xl text-muted-foreground">
             Each day builds on the previous one. Follow the path sequentially or
             jump to any topic you need.
           </p>
+
+          {/* Jump to Day dropdown */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Jump to:</span>
+            <Select onValueChange={(val) => onSelectDay(parseInt(val, 10))}>
+              <SelectTrigger className="h-9 w-[220px] gap-2 text-sm">
+                <SelectValue placeholder="Select a day..." />
+              </SelectTrigger>
+              <SelectContent className="max-h-80">
+                {allDays.map((day) => (
+                  <SelectItem key={day.day} value={String(day.day)}>
+                    <span className="font-mono text-xs text-muted-foreground">
+                      {day.date}
+                    </span>
+                    <span className="ml-2 truncate">{day.title}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
-        {/* Day cards grid */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {allDays.map((day) => {
-            const isCompleted = completedDays.has(day.day);
-            const colorClass =
-              categoryColors[day.category] ||
-              "from-primary/20 to-chart-2/20 text-primary";
-            // Derive a difficulty from the day number
-            const difficulty =
-              day.day <= 6 ? "Beginner" : day.day <= 12 ? "Intermediate" : "Advanced";
-            const difficultyColor =
-              difficulty === "Beginner"
-                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                : difficulty === "Intermediate"
-                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                : "bg-rose-500/10 text-rose-600 dark:text-rose-400";
+        {/* Day cards grid grouped by difficulty tier */}
+        <div className="space-y-12">
+          {tiers.map((tier) => {
+            const tierDays = allDays.filter(
+              (d) => d.day >= tier.range[0] && d.day <= tier.range[1]
+            );
+            const completedInTier = tierDays.filter((d) =>
+              completedDays.has(d.day)
+            ).length;
+            const TierIcon = tier.icon;
 
             return (
-              <Card
-                key={day.day}
-                className="group relative flex cursor-pointer flex-col overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl"
-                onClick={() => onSelectDay(day.day)}
-              >
-                {/* Category color strip */}
-                <div
-                  className={cn(
-                    "absolute inset-x-0 top-0 h-1 bg-gradient-to-r",
-                    colorClass.split(" ")[0],
-                    colorClass.split(" ")[1]
-                  )}
-                />
-
-                <div className="flex items-start justify-between gap-3">
+              <div key={tier.name}>
+                {/* Tier section header */}
+                <div className="mb-5 flex items-center gap-3">
                   <div
                     className={cn(
-                      "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br font-mono text-base font-bold shadow-sm",
-                      colorClass
+                      "flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-sm",
+                      tier.color
                     )}
                   >
-                    {String(day.day).padStart(2, "0")}
+                    <TierIcon className="h-5 w-5" />
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold tracking-tight">
+                      {tier.name}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Days {String(tier.range[0]).padStart(2, "0")}–
+                      {String(tier.range[1]).padStart(2, "0")} ·{" "}
+                      {completedInTier}/{tierDays.length} completed
+                    </p>
+                  </div>
+                  <div className="hidden h-1.5 flex-1 overflow-hidden rounded-full bg-muted sm:block">
+                    <div
                       className={cn(
-                        "rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                        difficultyColor
+                        "h-full rounded-full bg-gradient-to-r transition-all duration-500",
+                        tier.color
                       )}
-                    >
-                      {difficulty}
-                    </span>
-                    {isCompleted && (
-                      <CheckCircle2 className="h-5 w-5 text-primary" />
-                    )}
+                      style={{
+                        width: `${Math.round(
+                          (completedInTier / tierDays.length) * 100
+                        )}%`,
+                      }}
+                    />
                   </div>
                 </div>
 
-                <h3 className="mt-4 font-semibold leading-snug transition-colors group-hover:text-primary">
-                  {day.title}
-                </h3>
-                <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
-                  {day.description}
-                </p>
+                {/* Cards in this tier */}
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {tierDays.map((day) => {
+                    const isCompleted = completedDays.has(day.day);
+                    const colorClass =
+                      categoryColors[day.category] ||
+                      "from-primary/20 to-chart-2/20 text-primary";
+                    const difficultyColor =
+                      tier.name === "Beginner"
+                        ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                        : tier.name === "Intermediate"
+                        ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                        : "bg-rose-500/10 text-rose-600 dark:text-rose-400";
 
-                <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {day.duration}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Layers className="h-3 w-3" />
-                    {day.sections.length} sections
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Target className="h-3 w-3" />
-                    {day.topics.length} topics
-                  </span>
-                </div>
+                    return (
+                      <Card
+                        key={day.day}
+                        className="group relative flex cursor-pointer flex-col overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl"
+                        onClick={() => onSelectDay(day.day)}
+                      >
+                        {/* Category color strip */}
+                        <div
+                          className={cn(
+                            "absolute inset-x-0 top-0 h-1 bg-gradient-to-r",
+                            colorClass.split(" ")[0],
+                            colorClass.split(" ")[1]
+                          )}
+                        />
 
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {day.tags.slice(0, 3).map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                        <div className="flex items-start justify-between gap-3">
+                          <div
+                            className={cn(
+                              "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br font-mono text-base font-bold shadow-sm",
+                              colorClass
+                            )}
+                          >
+                            {String(day.day).padStart(2, "0")}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={cn(
+                                "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                                difficultyColor
+                              )}
+                            >
+                              {tier.name}
+                            </span>
+                            {isCompleted && (
+                              <CheckCircle2 className="h-5 w-5 text-primary" />
+                            )}
+                          </div>
+                        </div>
 
-                <div className="mt-4 flex items-center gap-1 border-t pt-3 text-sm font-medium text-primary opacity-0 transition-all duration-300 group-hover:opacity-100">
-                  Read notes
-                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        <h3 className="mt-4 font-semibold leading-snug transition-colors group-hover:text-primary">
+                          {day.title}
+                        </h3>
+                        <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
+                          {day.description}
+                        </p>
+
+                        <div className="mt-4 flex items-center gap-3 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {day.duration}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Layers className="h-3 w-3" />
+                            {day.sections.length} sections
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Target className="h-3 w-3" />
+                            {day.topics.length} topics
+                          </span>
+                        </div>
+
+                        <div className="mt-3 flex flex-wrap gap-1">
+                          {day.tags.slice(0, 3).map((tag) => (
+                            <span
+                              key={tag}
+                              className="rounded-md bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+
+                        <div className="mt-4 flex items-center gap-1 border-t pt-3 text-sm font-medium text-primary opacity-0 transition-all duration-300 group-hover:opacity-100">
+                          Read notes
+                          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                        </div>
+                      </Card>
+                    );
+                  })}
                 </div>
-              </Card>
+              </div>
             );
           })}
         </div>

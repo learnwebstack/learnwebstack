@@ -77,6 +77,7 @@ export function DayView({
     const newVal = !bookmarked;
     setBookmarked(newVal);
     localStorage.setItem(`bookmark-day-${day.day}`, String(newVal));
+    window.dispatchEvent(new Event("bookmark-changed"));
   };
 
   React.useEffect(() => {

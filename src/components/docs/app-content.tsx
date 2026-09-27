@@ -144,6 +144,19 @@ export function AppContent() {
       params.set("day", String(day));
       router.push(`?${params.toString()}`, { scroll: true });
       setSidebarOpen(false);
+
+      // Record recently viewed day (most recent first, unique, max 8)
+      try {
+        const stored = JSON.parse(
+          localStorage.getItem("recent-days") || "[]"
+        ) as number[];
+        const updated = [day, ...stored.filter((d) => d !== day)].slice(0, 8);
+        localStorage.setItem("recent-days", JSON.stringify(updated));
+        window.dispatchEvent(new Event("recent-days-changed"));
+      } catch {
+        /* noop */
+      }
+
       if (sectionId) {
         setTimeout(() => {
           const el = document.getElementById(sectionId);

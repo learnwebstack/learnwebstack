@@ -209,3 +209,66 @@ The project is a 17-day Full Stack Web Development documentation website (Next.j
   3. Consider a "recently viewed" or "continue reading" section on the home page using localStorage history
   4. Add Open Graph preview image generation for social sharing
   5. Add a table of contents for the entire course (all 17 days' topics) on a dedicated overview page
+
+---
+Task ID: CRON-2
+Agent: Z.ai Code (cron webDevReview round 2)
+Task: QA verification + new home page features (recently viewed, bookmarks, tier separators, jump-to-day)
+
+## Current Project Status Description / Assessment
+The project is a 17-day Full Stack Web Development documentation website (Next.js 16 + TypeScript + Tailwind + shadcn/ui). At the start of this round, the site was fully stable: ESLint clean, all routes 200, no runtime errors, and 11 features already implemented in CRON-1 (collapsible sidebar, progress %, difficulty badges, reading time, back-to-top, keyboard shortcuts, code download, language badges, print styles, scrollbar styling, keyboard navigation). The phase was stable, so this round focused on implementing the next-phase recommendations from CRON-1: recently viewed section, bookmarks section, difficulty tier separators, and jump-to-day dropdown.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### QA Findings (via agent-browser)
+- Home page: 17 cards render, no console errors ✓
+- Day pages: code blocks, TOC, print button, reading time all present ✓
+- ESLint: 0 errors ✓
+- All routes (/, /?day=1, /?day=5, /?day=10, /?day=17, /sitemap.xml, SVGs): 200 ✓
+- No regressions from CRON-1 work
+
+### New Features Added
+1. **Difficulty tier section separators** — The home curriculum grid is now grouped into 3 tiers (Beginner Days 01–06, Intermediate Days 07–12, Advanced Days 13–17) with:
+   - Gradient-colored tier header icons (emerald→green, amber→orange, rose→fuchsia) using Sparkles/Zap/GraduationCap icons
+   - Tier title + "Days XX–YY · N/M completed" subtitle
+   - Per-tier gradient progress bar showing completion within that tier
+   - 12px spacing (space-y-12) between tiers for clear visual separation
+
+2. **Jump to Day dropdown** — A shadcn Select dropdown in the curriculum header ("Jump to: [Select a day...]") listing all 17 days with their date + title, enabling power users to navigate directly to any day without scrolling
+
+3. **Continue Reading / Recently Viewed section** — Appears on the home page (only when user has viewing history) showing up to 4 recently visited days as clickable cards with day number, title, category, completion checkmark, and hover arrow animation. History tracked in localStorage `recent-days` (most-recent-first, unique, max 8) via navigateToDay callback, with custom `recent-days-changed` event for reactive updates.
+
+4. **Your Bookmarks section** — Appears on the home page (only when user has bookmarks) showing all bookmarked days as clickable cards with BookmarkCheck icon, title, date+duration, and hover effects. Listens to a new `bookmark-changed` event dispatched when toggling bookmarks in the day view, so the home page updates reactively.
+
+### Styling Improvements
+- Stats grid cards: added hover lift (-translate-y-0.5) + shadow-md transition
+- Features strip items: added hover translate-x-0.5 micro-interaction
+- Hero grid pattern: reduced opacity (50→40) for less visual noise
+- Empty-state behavior: Continue Reading and Bookmarks sections only render when there's data, avoiding clutter for new users
+
+### Bug Fixes / Integration Changes
+- Updated `navigateToDay` in app-content.tsx to record visited days in localStorage `recent-days` and dispatch `recent-days-changed` event
+- Updated `toggleBookmark` in day-view.tsx to dispatch `bookmark-changed` event so the home page reactively updates its bookmarks section
+- Added Select component import and getDayByNumber import to home-page.tsx
+- Added History, BookmarkCheck, ChevronDown icon imports
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=5, /?day=10, /?day=17, /sitemap.xml, SVG assets ✓
+- agent-browser feature verification: tierHeaders=["Beginner","Intermediate","Advanced"], jumpToSelect=true, continueReading=true, bookmarks=true, cardCount=17, tierProgressBars=5 ✓
+- Recently viewed tracking verified: clicked 3 different day cards → localStorage `recent-days` = "[4,2,1]" → Continue Reading section appears with all 3 ✓
+- Bookmark tracking verified: bookmarked Day 7 → localStorage `bookmark-day-7`="true" → Your Bookmarks section appears on home ✓
+- Day view verification (Day 12): 6 code blocks, 6 TOC links, difficulty="Intermediate", readingTime="6 min read" ✓
+- VLM assessment: 9/10 polish — "tier headers exceptionally clear with distinct color-coded icons and progress bars; Continue Reading prominently displayed; Jump to Day dropdown clearly visible"
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — all features from CRON-1 and CRON-2 work correctly with no regressions
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
+- Author name "Ketan Kore" remains intentionally absent per user request
+- **Recommended next-phase priorities**:
+  1. Generate an Open Graph preview image (og.png) for social sharing — currently metadata references no image
+  2. Add a dedicated course overview page with a full table of contents listing all 17 days' topics in one view (improves SEO and discoverability)
+  3. Add a "Reset all data" option (clears completed days, bookmarks, recent history together) in the sidebar footer
+  4. Add scroll-spy refinement: highlight the current day in the sidebar automatically based on scroll position within long day pages
+  5. Add a share button on day pages (copy URL to clipboard / native share API) for easy linking
+  6. Consider adding estimated total course time and per-track time in the hero or curriculum header
