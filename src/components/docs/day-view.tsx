@@ -26,6 +26,7 @@ import type { DayContent } from "@/data/types";
 import { getAdjacentDays, allDays } from "@/data/days";
 import { SectionRenderer } from "./section-renderer";
 import { TableOfContents } from "./table-of-contents";
+import { StudyTimer } from "./study-timer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -186,6 +187,7 @@ export function DayView({
                 <BookOpen className="h-3 w-3" />
                 {readingTime} min read
               </span>
+              <StudyTimer day={day.day} />
             </div>
             <h1 className="day-title text-3xl font-bold tracking-tight sm:text-4xl">
               {day.title}

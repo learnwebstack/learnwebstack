@@ -644,3 +644,56 @@ The project is a 17-day Full Stack Web Development documentation website (Next.j
   4. Add a weekly progress chart/heatmap visualization showing study activity
   5. Add a "study timer" that tracks time spent reading each day
   6. Add a dedicated "Favorites" view/modal showing all starred sections in one place (currently limited to 6 in sidebar)
+
+---
+Task ID: CRON-10
+Agent: Z.ai Code (cron webDevReview round 10)
+Task: QA verification + study timer, image figure styling polish, progress-data integration
+
+## Current Project Status Description / Assessment
+The project is a 17-day Full Stack Web Development documentation website (Next.js 16 + TypeScript + Tailwind + shadcn/ui). At the start of this round, the site was fully stable: ESLint clean, all routes 200, no runtime errors, with 34 features already implemented across CRON-1 through CRON-9. The phase was stable, so this round implemented the next-phase recommendation from CRON-9: a study timer that tracks time spent reading each day, plus image figure styling polish.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### QA Findings (via agent-browser)
+- Home page: 17 cards, 3 tier headers, no console errors ✓
+- Day pages: breadcrumb, TOC filter, streak, star buttons, copy-link buttons all present ✓
+- ESLint: 0 errors ✓
+- All routes (/, /?day=1, /?day=5, /?day=9, /?day=17, /sitemap.xml, /og-image.png, SVGs): 200 ✓
+- No regressions from previous rounds
+
+### New Features Added
+1. **Study timer** — A per-day reading timer that tracks time spent on each day page:
+   - Created `/src/components/docs/study-timer.tsx` with a pill-shaped inline component displaying elapsed time (Timer icon + "Xm YYs" format + pause/resume + reset buttons)
+   - Time stored in localStorage `study-time-day-{N}` per day, persists across page reloads
+   - Auto-starts counting when a day page loads; auto-pauses when the browser tab becomes hidden (visibilitychange API)
+   - Pause/resume button toggles between Play/Pause icons; reset button clears the timer back to 0
+   - Mounted in the day header badges row (after reading time), using `font-mono tabular-nums` for stable digit width
+   - Integrated with the export/import system: `study-time-day-{N}` keys added to PROGRESS_KEYS prefix list in progress-data.ts, so study times are included in JSON exports/imports
+   - Reset All Data now clears all 17 study-time entries and dispatches change events
+
+### Styling Improvements
+- **Image figure**: upgraded from `p-4 my-6` to `p-6 my-8` for more breathing room; added `transition-shadow hover:shadow-md` for interactive feedback; caption upgraded from `text-sm font-medium` to `text-sm font-semibold` with `max-w-2xl mx-auto` for better readability on wide screens; description text gets `leading-relaxed` and `mt-1.5` for better spacing
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=5, /?day=9, /?day=17, /sitemap.xml, /og-image.png, SVG assets ✓
+- agent-browser feature verification:
+  * Study timer present with aria-label, 4 icons (timer/pause/play/reset), counting up (1s → 10s → 26s) ✓
+  * Pause button works: clicking switches to Play icon, timer stops counting ✓
+  * Timer visible at position (808, 150) with tabular-nums text ✓
+  * Image figure: 1 on Day 1, hover:shadow-md present, p-6 padding, max-w-2xl caption ✓
+- VLM assessment: 9/10 polish — "image diagram well-styled within bordered container with clear title and descriptive caption; exceptionally clean and professional, sophisticated layout, high-quality syntax-highlighted code blocks, structured callout boxes, excellent typographic hierarchy" ✓
+- No console errors during navigation ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — all features from CRON-1 through CRON-10 work correctly with no regressions
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
+- Author name "Ketan Kore" remains intentionally absent per user request
+- **Recommended next-phase priorities**:
+  1. Add a dedicated course overview page with a full table of contents listing all 17 days' topics in one view (improves SEO and discoverability)
+  2. Add a dark-mode-specific OG image for users who share from dark mode
+  3. Add a course completion certificate/downloadable summary when all 17 days are done
+  4. Add a weekly progress chart/heatmap visualization showing study activity
+  5. Add a dedicated "Favorites" view/modal showing all starred sections in one place (currently limited to 6 in sidebar)
+  6. Add a total study time summary in the sidebar (aggregate of all day study times)

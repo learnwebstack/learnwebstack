@@ -430,6 +430,10 @@ export function DocsSidebar({
             for (let d = 1; d <= allDays.length; d++) {
               localStorage.removeItem(`bookmark-day-${d}`);
             }
+            // Remove all study-time entries
+            for (let d = 1; d <= allDays.length; d++) {
+              localStorage.removeItem(`study-time-day-${d}`);
+            }
             localStorage.removeItem("recent-days");
             localStorage.removeItem("recent-days-timestamps");
             localStorage.removeItem("visit-dates");

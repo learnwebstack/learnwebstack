@@ -110,8 +110,8 @@ export function SectionRenderer({ section }: { section: ContentSection }) {
       )}
 
       {section.image && (
-        <figure className="my-6">
-          <div className="overflow-hidden rounded-xl border bg-card p-4 shadow-sm">
+        <figure className="my-8">
+          <div className="overflow-hidden rounded-xl border bg-card p-6 shadow-sm transition-shadow hover:shadow-md">
             <img
               src={section.image.src}
               alt={section.image.alt}
@@ -119,12 +119,12 @@ export function SectionRenderer({ section }: { section: ContentSection }) {
               loading="lazy"
             />
           </div>
-          <figcaption className="mt-3 text-center">
-            <p className="text-sm font-medium text-foreground">
+          <figcaption className="mx-auto mt-4 max-w-2xl text-center">
+            <p className="text-sm font-semibold text-foreground">
               {section.image.caption}
             </p>
             {section.image.description && (
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">
                 {section.image.description}
               </p>
             )}

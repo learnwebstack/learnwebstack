@@ -13,6 +13,8 @@ const PROGRESS_KEYS = [
 
 // Bookmark keys follow the pattern `bookmark-day-{N}`
 const BOOKMARK_PREFIX = "bookmark-day-";
+// Study time keys follow the pattern `study-time-day-{N}`
+const STUDY_TIME_PREFIX = "study-time-day-";
 const TOTAL_DAYS = 17;
 
 export interface ProgressData {
@@ -34,6 +36,13 @@ export function exportProgress(): ProgressData {
     const val = localStorage.getItem(`${BOOKMARK_PREFIX}${d}`);
     if (val !== null) {
       data[`${BOOKMARK_PREFIX}${d}`] = val;
+    }
+  }
+  // Collect all study-time entries
+  for (let d = 1; d <= TOTAL_DAYS; d++) {
+    const val = localStorage.getItem(`${STUDY_TIME_PREFIX}${d}`);
+    if (val !== null) {
+      data[`${STUDY_TIME_PREFIX}${d}`] = val;
     }
   }
   return {
@@ -68,7 +77,8 @@ export function importProgress(json: string): { success: boolean; error?: string
       // Only restore known keys to prevent pollution
       const isKnown =
         PROGRESS_KEYS.includes(key as (typeof PROGRESS_KEYS)[number]) ||
-        key.startsWith(BOOKMARK_PREFIX);
+        key.startsWith(BOOKMARK_PREFIX) ||
+        key.startsWith(STUDY_TIME_PREFIX);
       if (isKnown && typeof value === "string") {
         localStorage.setItem(key, value);
         count++;
