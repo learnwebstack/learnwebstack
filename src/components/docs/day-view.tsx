@@ -159,10 +159,10 @@ export function DayView({
                 {readingTime} min read
               </span>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
+            <h1 className="day-title text-3xl font-bold tracking-tight sm:text-4xl">
               {day.title}
             </h1>
-            <p className="mt-3 text-lg text-muted-foreground">{day.subtitle}</p>
+            <p className="day-description mt-3 text-lg text-muted-foreground">{day.subtitle}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {day.tags.map((tag) => (
                 <span

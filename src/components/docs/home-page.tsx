@@ -21,7 +21,7 @@ import {
   History,
   ChevronDown,
 } from "lucide-react";
-import { allDays, courseStats, getDayByNumber } from "@/data/days";
+import { allDays, courseStats, getDayByNumber, estimateReadingMinutesForDays } from "@/data/days";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -405,6 +405,11 @@ export function HomePage({
             const completedInTier = tierDays.filter((d) =>
               completedDays.has(d.day)
             ).length;
+            const tierMinutes = estimateReadingMinutesForDays(tierDays);
+            const tierTimeLabel =
+              tierMinutes >= 60
+                ? `${Math.round(tierMinutes / 60)}h ${tierMinutes % 60}m`
+                : `${tierMinutes}m`;
             const TierIcon = tier.icon;
 
             return (
@@ -426,7 +431,11 @@ export function HomePage({
                     <p className="text-xs text-muted-foreground">
                       Days {String(tier.range[0]).padStart(2, "0")}–
                       {String(tier.range[1]).padStart(2, "0")} ·{" "}
-                      {completedInTier}/{tierDays.length} completed
+                      {completedInTier}/{tierDays.length} completed ·{" "}
+                      <span className="inline-flex items-center gap-0.5">
+                        <Clock className="h-3 w-3" />
+                        {tierTimeLabel}
+                      </span>
                     </p>
                   </div>
                   <div className="hidden h-1.5 flex-1 overflow-hidden rounded-full bg-muted sm:block">

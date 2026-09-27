@@ -12,6 +12,7 @@ import { SearchDialog } from "@/components/docs/search-dialog";
 import { ReadingProgress } from "@/components/docs/reading-progress";
 import { BackToTop } from "@/components/docs/back-to-top";
 import { ShortcutsHelp } from "@/components/docs/shortcuts-help";
+import { MobileDayNav } from "@/components/docs/mobile-day-nav";
 import { useTheme } from "next-themes";
 import {
   Sheet,
@@ -258,6 +259,10 @@ export function AppContent() {
       <ShortcutsHelp open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
 
       <BackToTop />
+
+      {selectedDay && (
+        <MobileDayNav currentDay={selectedDay.day} onNavigate={navigateToDay} />
+      )}
     </div>
   );
 }

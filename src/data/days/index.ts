@@ -44,7 +44,7 @@ export function getAdjacentDays(day: number): {
   };
 }
 
-function estimateReadingMinutes(day: DayContent): number {
+export function estimateReadingMinutes(day: DayContent): number {
   let wordCount = day.description.split(/\s+/).length;
   for (const section of day.sections) {
     for (const p of section.paragraphs || []) {
@@ -55,6 +55,10 @@ function estimateReadingMinutes(day: DayContent): number {
     }
   }
   return Math.max(1, Math.round(wordCount / 200));
+}
+
+export function estimateReadingMinutesForDays(days: DayContent[]): number {
+  return days.reduce((sum, d) => sum + estimateReadingMinutes(d), 0);
 }
 
 export const courseStats = {

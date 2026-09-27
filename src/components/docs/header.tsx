@@ -4,6 +4,7 @@ import * as React from "react";
 import { Search, Menu, BookOpen, Github, Home, Keyboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { FontSizeControl } from "@/components/docs/font-size-control";
 import { Badge } from "@/components/ui/badge";
 import { courseStats } from "@/data/days";
 
@@ -78,6 +79,7 @@ export function Header({
           >
             <Home className="h-4 w-4" />
           </Button>
+          <FontSizeControl />
           <ThemeToggle />
           <Button
             variant="ghost"

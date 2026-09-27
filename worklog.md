@@ -328,3 +328,54 @@ The project is a 17-day Full Stack Web Development documentation website (Next.j
   4. Add per-track reading time in the tier section headers (Beginner: X min, Intermediate: Y min, Advanced: Z min)
   5. Add a "next/prev" floating action button on mobile for thumb-friendly day navigation
   6. Consider adding keyboard shortcut for "Jump to Day" dropdown (e.g., J key opens the select)
+
+---
+Task ID: CRON-4
+Agent: Z.ai Code (cron webDevReview round 4)
+Task: QA verification + font-size control, per-track reading time, mobile floating nav, styling polish
+
+## Current Project Status Description / Assessment
+The project is a 17-day Full Stack Web Development documentation website (Next.js 16 + TypeScript + Tailwind + shadcn/ui). At the start of this round, the site was fully stable: ESLint clean, all routes 200, no runtime errors, with 19 features already implemented across CRON-1, CRON-2, and CRON-3. The phase was stable, so this round implemented the next-phase recommendations from CRON-3: font-size adjustment control, per-track reading time, mobile floating navigation, and styling polish.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### QA Findings (via agent-browser)
+- Home page: 17 cards render, 3 tier headers, no console errors ✓
+- Day pages: 6 code blocks, 4 callouts, share button, key takeaways all present ✓
+- ESLint: 0 errors ✓
+- All routes (/, /?day=1, /?day=5, /?day=9, /?day=17, /sitemap.xml, /og-image.png, SVGs): 200 ✓
+- No regressions from previous rounds
+
+### New Features Added
+1. **Font-size adjustment control (A−/A/A+)** — Added a FontSizeControl component to the header (between Home and Theme toggle). Cycles through 3 sizes (small→normal→large→small) on click. Applies `body.font-small` or `body.font-large` classes that scale documentation prose (paragraphs, headings, lists) via dedicated CSS rules. Persists preference in localStorage `font-size`. Shows the current size label (A−/A/A+) with a Type icon. Accessibility: aria-label and title describe the current state. Hidden label on mobile (icon only).
+
+2. **Per-track reading time in tier headers** — The home page tier section headers (Beginner/Intermediate/Advanced) now show estimated reading time alongside day ranges and completion status (e.g., "Days 01–06 · 1/6 completed · 23m"). Added `estimateReadingMinutesForDays()` helper exported from data/days/index.ts. Time formatted as "Xm" under 60 min, "Xh Ym" over 60 min.
+
+3. **Mobile floating prev/next navigation** — Added a MobileDayNav component that appears as two floating pill buttons (Previous/Next) at the bottom of day pages on mobile devices only (`md:hidden`). Shows after scrolling 400px down. Each button shows "Day XX" with a chevron, disabled state when no prev/next day exists, scale hover animation. Hidden on desktop and on the home page.
+
+### Styling Improvements
+- **Font size CSS system**: added `body.font-small` and `body.font-large` classes in globals.css that scale `.prose-doc` content (paragraphs 0.875rem/1.0625rem, headings, lists, line-heights), plus `.day-title` and `.day-description` classes on the day view h1/subtitle for larger-font scaling
+- **Removed unused imports**: Minus, Plus icons from font-size-control; cleaned up the component for better tree-shaking
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=5, /?day=9, /?day=17, /sitemap.xml, /og-image.png, SVG assets ✓
+- agent-browser feature verification:
+  * Home page: tierTimeLabels=["Days 01–06 · 1/6 completed · 23m", "Days 07–12 · 0/6 completed · 33m", "Days 13–17 · 0/5 completed · 24m"], fontControl=true ✓
+  * Font size control: clicking cycles body class (font-large → font-small → normal), localStorage persists ✓
+  * Day page: 6 code blocks, 4 callouts, 1 share button, 1 key takeaways section ✓
+- VLM assessment: home page 9/10 polish — "tier headers display reading time estimates; clean modern aesthetic with excellent typography, consistent spacing, well-organized card-based layout" ✓
+- VLM assessment: day page 8/10 polish — "clean professional aesthetic, code blocks feature clear syntax highlighting, callouts use effective background colors and icons, strong visual hierarchy" ✓
+- No console errors during navigation ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — all features from CRON-1 through CRON-4 work correctly with no regressions
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
+- Author name "Ketan Kore" remains intentionally absent per user request
+- **Recommended next-phase priorities**:
+  1. Add a dedicated course overview page with a full table of contents listing all 17 days' topics in one view (improves SEO and discoverability)
+  2. Add scroll-spy to highlight the current day in the sidebar based on scroll position within long day pages
+  3. Add keyboard shortcut "J" to open the Jump to Day dropdown
+  4. Add a "copy link to section" feature on section headings (the # anchor link currently just navigates)
+  5. Add a progress celebration animation/toast when completing a day (confetti or success message)
+  6. Consider adding a dark-mode-specific OG image for users who share from dark mode

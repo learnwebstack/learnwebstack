@@ -182,8 +182,24 @@
 /* Prose styles for documentation content */
 .prose-doc {
   @apply text-foreground;
-  font-size: 0.95rem;
+  font-size: var(--doc-scale, 1) * 0.95rem;
+  font-size: calc(var(--doc-scale, 1) * 0.95rem);
 }
+
+/* Font size adjustment control — scales documentation content */
+body.font-small .prose-doc { font-size: 0.875rem; }
+body.font-small .prose-doc p { font-size: 0.875rem; line-height: 1.75; }
+body.font-small .prose-doc h2 { font-size: 1.5rem; }
+body.font-small .prose-doc h3 { font-size: 1.25rem; }
+body.font-small .prose-doc li { font-size: 0.875rem; }
+
+body.font-large .prose-doc { font-size: 1.0625rem; }
+body.font-large .prose-doc p { font-size: 1.0625rem; line-height: 1.85; }
+body.font-large .prose-doc h2 { font-size: 1.75rem; }
+body.font-large .prose-doc h3 { font-size: 1.375rem; }
+body.font-large .prose-doc li { font-size: 1.0625rem; }
+body.font-large .day-description { font-size: 1.125rem; }
+body.font-large .day-title { font-size: 2.25rem; }
 
 .prose-doc p {
   @apply leading-8 text-muted-foreground mb-5;
