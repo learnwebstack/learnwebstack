@@ -203,17 +203,26 @@ export function HomePage({
         </div>
 
         {/* Day cards grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {allDays.map((day) => {
             const isCompleted = completedDays.has(day.day);
             const colorClass =
               categoryColors[day.category] ||
               "from-primary/20 to-chart-2/20 text-primary";
+            // Derive a difficulty from the day number
+            const difficulty =
+              day.day <= 6 ? "Beginner" : day.day <= 12 ? "Intermediate" : "Advanced";
+            const difficultyColor =
+              difficulty === "Beginner"
+                ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : difficulty === "Intermediate"
+                ? "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                : "bg-rose-500/10 text-rose-600 dark:text-rose-400";
 
             return (
               <Card
                 key={day.day}
-                className="group relative cursor-pointer overflow-hidden p-5 transition-all hover:border-primary hover:shadow-lg"
+                className="group relative flex cursor-pointer flex-col overflow-hidden p-6 transition-all duration-300 hover:-translate-y-1 hover:border-primary hover:shadow-xl"
                 onClick={() => onSelectDay(day.day)}
               >
                 {/* Category color strip */}
@@ -228,21 +237,31 @@ export function HomePage({
                 <div className="flex items-start justify-between gap-3">
                   <div
                     className={cn(
-                      "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br font-mono text-sm font-bold",
+                      "flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br font-mono text-base font-bold shadow-sm",
                       colorClass
                     )}
                   >
                     {String(day.day).padStart(2, "0")}
                   </div>
-                  {isCompleted && (
-                    <CheckCircle2 className="h-5 w-5 text-primary" />
-                  )}
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                        difficultyColor
+                      )}
+                    >
+                      {difficulty}
+                    </span>
+                    {isCompleted && (
+                      <CheckCircle2 className="h-5 w-5 text-primary" />
+                    )}
+                  </div>
                 </div>
 
-                <h3 className="mt-3 font-semibold leading-snug group-hover:text-primary transition-colors">
+                <h3 className="mt-4 font-semibold leading-snug transition-colors group-hover:text-primary">
                   {day.title}
                 </h3>
-                <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
+                <p className="mt-1.5 flex-1 text-sm leading-relaxed text-muted-foreground line-clamp-2">
                   {day.description}
                 </p>
 
@@ -254,6 +273,10 @@ export function HomePage({
                   <span className="flex items-center gap-1">
                     <Layers className="h-3 w-3" />
                     {day.sections.length} sections
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Target className="h-3 w-3" />
+                    {day.topics.length} topics
                   </span>
                 </div>
 
@@ -268,9 +291,9 @@ export function HomePage({
                   ))}
                 </div>
 
-                <div className="mt-4 flex items-center gap-1 text-sm font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+                <div className="mt-4 flex items-center gap-1 border-t pt-3 text-sm font-medium text-primary opacity-0 transition-all duration-300 group-hover:opacity-100">
                   Read notes
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                 </div>
               </Card>
             );

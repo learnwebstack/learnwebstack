@@ -182,26 +182,27 @@
 /* Prose styles for documentation content */
 .prose-doc {
   @apply text-foreground;
+  font-size: 0.95rem;
 }
 
 .prose-doc p {
-  @apply leading-7 text-muted-foreground mb-4;
+  @apply leading-8 text-muted-foreground mb-5;
 }
 
 .prose-doc h2 {
-  @apply text-2xl font-bold tracking-tight mt-10 mb-3 scroll-mt-24;
+  @apply text-2xl font-bold tracking-tight mt-12 mb-4 scroll-mt-24;
 }
 
 .prose-doc h3 {
-  @apply text-xl font-semibold tracking-tight mt-6 mb-2 scroll-mt-24;
+  @apply text-xl font-semibold tracking-tight mt-8 mb-3 scroll-mt-24;
 }
 
 .prose-doc ul {
-  @apply my-4 space-y-2;
+  @apply my-5 space-y-2.5;
 }
 
 .prose-doc ol {
-  @apply my-4 space-y-2 list-decimal list-inside;
+  @apply my-5 space-y-2.5;
 }
 
 .prose-doc li {
@@ -209,7 +210,7 @@
 }
 
 .prose-doc code {
-  @apply font-mono text-sm bg-muted px-1.5 py-0.5 rounded;
+  @apply font-mono text-[0.85em] bg-muted px-1.5 py-0.5 rounded;
 }
 
 .prose-doc strong {
@@ -220,4 +221,101 @@
 @keyframes progress-grow {
   from { width: 0%; }
   to { width: var(--progress); }
+}
+
+/* Fade-in animation for content sections */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s ease-out;
+}
+
+/* Print-friendly styles for day pages */
+@media print {
+  header.sticky,
+  footer,
+  aside,
+  .fixed,
+  [aria-label="Back to top"],
+  [data-print-hidden] {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
+
+  .prose-doc p,
+  .prose-doc li {
+    color: #1a1a1a !important;
+  }
+
+  .prose-doc pre,
+  .prose-doc code {
+    background: #f5f5f5 !important;
+    color: #1a1a1a !important;
+    border: 1px solid #ddd !important;
+  }
+
+  main {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+
+  a[href]:after {
+    content: "" !important;
+  }
+
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl {
+    box-shadow: none !important;
+  }
+
+  .border,
+  .border-l-4 {
+    border-color: #ccc !important;
+  }
+
+  .bg-muted\/40,
+  .bg-muted\/50,
+  .bg-muted\/60 {
+    background: #f9f9f9 !important;
+  }
+
+  section {
+    break-inside: avoid;
+  }
+
+  .page-break {
+    break-after: page;
+  }
+}
+
+/* Smooth focus ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+  background-color: oklch(from var(--primary) l c h / 0.2);
+  color: var(--foreground);
 }

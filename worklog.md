@@ -147,3 +147,65 @@ Unresolved/Next Steps:
 - The actual uploaded days.zip was not available; the site uses comprehensive sample content that can be replaced with real PDF extracts
 - To integrate real PDFs: extract text/images from PDFs, convert to the DayContent data structure format, and swap into src/data/days/ files
 - Author name "Ketan Kore" was intentionally not mentioned anywhere in the site per user request
+
+---
+Task ID: CRON-1
+Agent: Z.ai Code (cron webDevReview round 1)
+Task: QA testing, bug fixes, styling improvements, and new features
+
+## Current Project Status Description / Assessment
+The project is a 17-day Full Stack Web Development documentation website (Next.js 16 + TypeScript + Tailwind + shadcn/ui). Prior to this round, the site was functional with all core features working: day-wise content, search, dark mode, progress tracking, bookmarks, TOC, and SEO. The site compiled cleanly and all routes returned 200. The phase was relatively stable with no runtime errors, so this round focused on QA-driven polish and new feature additions.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### QA Findings (via agent-browser + VLM analysis)
+- Inconsistent day card heights in the home grid (descriptions varied in length)
+- Tables lacked hover states and zebra striping
+- Code block comments had low contrast in dark mode
+- Paragraph spacing felt dense ("text walls")
+- No keyboard shortcuts help or back-to-top button
+
+### Bugs Fixed
+- Fixed duplicate `gPressed` ref declaration causing "name defined multiple times" Ecmascript error (500 on /?day=11)
+- Fixed invalid CSS `page-break-after: always;` at top level causing CSS parse failure (500 on all pages)
+- Fixed react-hooks/refs lint errors by moving ref updates from render body into useEffect
+- Fixed theme toggle using `theme` (undefined on first render) instead of `resolvedTheme`
+
+### Styling Improvements
+- Home day cards: now `flex flex-col` with `flex-1` description for consistent heights; added hover lift (-translate-y-1), shadow-xl on hover, animated arrow translate, border-top separator on "Read notes" CTA, larger padding (p-6), 12px day-number badges
+- Tables: added zebra striping (odd rows bg-muted/20), hover highlight (bg-primary/5), increased padding (px-5 py-3.5), tracking-wide headers, shadow-sm container
+- Code blocks: custom theme overrides for all token types (comments, strings, keywords, etc.) with WCAG-friendly colors for both light/dark — VLM rated contrast 8/10 in dark mode (up from "low contrast")
+- Prose spacing: increased paragraph leading (leading-8), mb-5, h2 mt-12 mb-4, h3 mt-8 mb-3, ul/ol my-5 space-y-2.5 for better readability
+- Added focus-visible outline, ::selection color, fade-in-up animation utility
+
+### New Features Added
+1. **Collapsible sidebar by track** — days grouped into 4 tracks (HTML & CSS, JavaScript, React, Full Stack) with Collapsible sections, per-track completion counters (e.g. "3/6"), auto-expand of current day's track, chevron rotation animation
+2. **Progress percentage in sidebar** — gradient progress bar + large percentage number with Trophy icon
+3. **Difficulty badges** — Beginner (emerald) / Intermediate (amber) / Advanced (rose) on both home day cards and day view headers, derived from day number
+4. **Reading time estimate** — computed from word count (~200 wpm, code at 0.5x), shown as "X min read" with BookOpen icon in day header
+5. **Back-to-top button** — fixed bottom-right, appears after 600px scroll, smooth scroll, scale hover animation
+6. **Keyboard shortcuts help modal** — press `?` to open; lists all shortcuts (⌘K search, ⌘B theme, ? help, g→h home, g→←/→ prev/next day, Esc close); keyboard icon button added to header
+7. **Full keyboard navigation** — g then h (home), g then ←/→ (prev/next day), all with 800ms key sequence window and typing-detection guard
+8. **Code block download button** — download icon to save snippet as file with correct extension (.html, .css, .js, .ts, .sh, .json)
+9. **Code block language badge** — colored pill showing HTML/CSS/JavaScript/JSX/TSX/Bash/JSON with language-specific colors
+10. **Print-friendly stylesheet** — @media print hides header/footer/sidebar/back-to-top, forces black text on white, removes shadows, avoids page breaks inside sections; Print button in day header
+11. **Code block scrollbar styling** — custom thin scrollbar for horizontal code overflow
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=5, /?day=11, /?day=17, /sitemap.xml, SVG assets ✓
+- No console errors captured during navigation across 5 day pages ✓
+- agent-browser confirmed all 17 home cards render, 6 code blocks + 6 TOC links on day 3 ✓
+- VLM assessment: home page rated 9/10 professionalism, cards consistent height, dark mode code contrast 8/10 ✓
+- Feature presence verified via DOM eval: sidebarGroups=12, progressPercent=6%, backToTop=true, printButton=1, keyboardIcon=true, readingTime="4 min read", difficultyBadge="Beginner" ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — all QA issues from this round have been fixed
+- The actual uploaded days.zip (teacher's PDF notes) is still not available in /home/z/my-project/upload/; the site uses comprehensive sample content. To integrate real PDFs: extract text/images, convert to DayContent structure in src/data/days/day-XX.ts
+- Author name "Ketan Kore" remains intentionally absent per user request
+- **Recommended next-phase priorities**:
+  1. Add a "Jump to Day" dropdown/stepper in the curriculum header for power users
+  2. Add visual separators or section headers between difficulty tiers (Beginner/Intermediate/Advanced) in the home curriculum grid
+  3. Consider a "recently viewed" or "continue reading" section on the home page using localStorage history
+  4. Add Open Graph preview image generation for social sharing
+  5. Add a table of contents for the entire course (all 17 days' topics) on a dedicated overview page

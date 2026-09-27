@@ -79,14 +79,14 @@ export function SectionRenderer({ section }: { section: ContentSection }) {
       ))}
 
       {section.table && (
-        <div className="my-5 overflow-x-auto rounded-xl border">
+        <div className="my-6 overflow-x-auto rounded-xl border shadow-sm">
           <table className="w-full text-sm">
-            <thead className="bg-muted/50">
+            <thead className="bg-muted/60">
               <tr>
                 {section.table.headers.map((header, i) => (
                   <th
                     key={i}
-                    className="border-b px-4 py-3 text-left font-semibold"
+                    className="border-b px-5 py-3.5 text-left font-semibold tracking-wide"
                   >
                     {header}
                   </th>
@@ -95,13 +95,19 @@ export function SectionRenderer({ section }: { section: ContentSection }) {
             </thead>
             <tbody>
               {section.table.rows.map((row, i) => (
-                <tr key={i} className="border-b last:border-0 transition-colors hover:bg-muted/30">
+                <tr
+                  key={i}
+                  className={cn(
+                    "border-b last:border-0 transition-colors hover:bg-primary/5",
+                    i % 2 === 1 && "bg-muted/20"
+                  )}
+                >
                   {row.map((cell, j) => (
                     <td
                       key={j}
                       className={cn(
-                        "px-4 py-3 text-muted-foreground",
-                        j === 0 && "font-medium text-foreground"
+                        "px-5 py-3.5 text-muted-foreground leading-relaxed",
+                        j === 0 && "font-semibold text-foreground"
                       )}
                       dangerouslySetInnerHTML={{ __html: formatInline(cell) }}
                     />

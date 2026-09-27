@@ -10,6 +10,9 @@ import { DayView } from "@/components/docs/day-view";
 import { DocsSidebar } from "@/components/docs/sidebar";
 import { SearchDialog } from "@/components/docs/search-dialog";
 import { ReadingProgress } from "@/components/docs/reading-progress";
+import { BackToTop } from "@/components/docs/back-to-top";
+import { ShortcutsHelp } from "@/components/docs/shortcuts-help";
+import { useTheme } from "next-themes";
 import {
   Sheet,
   SheetContent,
@@ -29,6 +32,8 @@ export function AppContent() {
   );
   const [searchOpen, setSearchOpen] = React.useState(false);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = React.useState(false);
+  const { setTheme } = useTheme();
 
   // Load completed days from localStorage
   React.useEffect(() => {
@@ -63,17 +68,75 @@ export function AppContent() {
     };
   }, []);
 
-  // Keyboard shortcut for search
+  // Keyboard shortcuts — uses refs defined below
+  const goHomeRef = React.useRef<() => void>(() => {});
+  const navigateToDayRef = React.useRef<(day: number, sectionId?: string) => void>(() => {});
+  const gPressed = React.useRef(false);
+
   React.useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isTyping =
+        target.tagName === "INPUT" ||
+        target.tagName === "TEXTAREA" ||
+        target.isContentEditable;
+
+      // Cmd/Ctrl + K → search
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         setSearchOpen((prev) => !prev);
+        return;
+      }
+      // Cmd/Ctrl + B → toggle theme
+      if ((e.metaKey || e.ctrlKey) && e.key === "b") {
+        e.preventDefault();
+        const isDark =
+          document.documentElement.classList.contains("dark");
+        setTheme(isDark ? "light" : "dark");
+        return;
+      }
+      // ? → shortcuts help (only when not typing)
+      if (e.key === "?" && !isTyping && !e.metaKey && !e.ctrlKey) {
+        e.preventDefault();
+        setShortcutsOpen((prev) => !prev);
+        return;
+      }
+      // g then h → home; g then ←/→ → prev/next day
+      if (!isTyping && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        if (e.key === "g" || e.key === "G") {
+          gPressed.current = true;
+          setTimeout(() => (gPressed.current = false), 800);
+          return;
+        }
+        if (gPressed.current) {
+          if (e.key === "h" || e.key === "H") {
+            e.preventDefault();
+            gPressed.current = false;
+            goHomeRef.current();
+            return;
+          }
+          if (e.key === "ArrowLeft" && currentDay && currentDay > 1) {
+            e.preventDefault();
+            gPressed.current = false;
+            navigateToDayRef.current(currentDay - 1);
+            return;
+          }
+          if (
+            e.key === "ArrowRight" &&
+            currentDay &&
+            currentDay < allDays.length
+          ) {
+            e.preventDefault();
+            gPressed.current = false;
+            navigateToDayRef.current(currentDay + 1);
+            return;
+          }
+        }
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, []);
+  }, [setTheme, currentDay]);
 
   const navigateToDay = React.useCallback(
     (day: number, sectionId?: string) => {
@@ -95,6 +158,12 @@ export function AppContent() {
     router.push("/", { scroll: true });
   }, [router]);
 
+  // Keep refs in sync so keyboard handler always calls latest callbacks
+  React.useEffect(() => {
+    goHomeRef.current = goHome;
+    navigateToDayRef.current = navigateToDay;
+  }, [goHome, navigateToDay]);
+
   const toggleComplete = React.useCallback((day: number) => {
     setCompletedDays((prev) => {
       const next = new Set(prev);
@@ -115,6 +184,7 @@ export function AppContent() {
         onSearchOpen={() => setSearchOpen(true)}
         onMenuToggle={() => setSidebarOpen(true)}
         onHomeClick={goHome}
+        onShortcutsOpen={() => setShortcutsOpen(true)}
         showMenuButton={!!selectedDay}
       />
 
@@ -171,6 +241,10 @@ export function AppContent() {
         onOpenChange={setSearchOpen}
         onSelectDay={(day, sectionId) => navigateToDay(day, sectionId)}
       />
+
+      <ShortcutsHelp open={shortcutsOpen} onOpenChange={setShortcutsOpen} />
+
+      <BackToTop />
     </div>
   );
 }

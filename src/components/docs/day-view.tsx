@@ -14,6 +14,7 @@ import {
   BookmarkCheck,
   ExternalLink,
   ListTodo,
+  Printer,
 } from "lucide-react";
 import type { DayContent } from "@/data/types";
 import { getAdjacentDays } from "@/data/days";
@@ -42,6 +43,30 @@ export function DayView({
   const { previous, next } = getAdjacentDays(day.day);
   const isCompleted = completedDays.has(day.day);
   const [bookmarked, setBookmarked] = React.useState(false);
+
+  // Estimate reading time from content word count (~200 wpm)
+  const readingTime = React.useMemo(() => {
+    let wordCount = day.description.split(/\s+/).length;
+    for (const section of day.sections) {
+      for (const p of section.paragraphs || []) {
+        wordCount += p.split(/\s+/).length;
+      }
+      for (const c of section.code || []) {
+        wordCount += c.code.split(/\s+/).length * 0.5; // code reads slower
+      }
+    }
+    const minutes = Math.max(1, Math.round(wordCount / 200));
+    return minutes;
+  }, [day]);
+
+  const difficulty =
+    day.day <= 6 ? "Beginner" : day.day <= 12 ? "Intermediate" : "Advanced";
+  const difficultyColor =
+    difficulty === "Beginner"
+      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+      : difficulty === "Intermediate"
+      ? "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20"
+      : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20";
 
   React.useEffect(() => {
     const stored = localStorage.getItem(`bookmark-day-${day.day}`);
@@ -86,9 +111,21 @@ export function DayView({
               <Badge variant="outline" className="text-xs">
                 {day.category}
               </Badge>
+              <span
+                className={cn(
+                  "rounded-full border px-2.5 py-0.5 text-xs font-medium",
+                  difficultyColor
+                )}
+              >
+                {difficulty}
+              </span>
               <span className="flex items-center gap-1 text-xs text-muted-foreground">
                 <Clock className="h-3 w-3" />
                 {day.duration}
+              </span>
+              <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                <BookOpen className="h-3 w-3" />
+                {readingTime} min read
               </span>
             </div>
             <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">
@@ -133,6 +170,15 @@ export function DayView({
                     Bookmark
                   </>
                 )}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => window.print()}
+                data-print-hidden
+              >
+                <Printer className="h-4 w-4" />
+                Print
               </Button>
             </div>
           </header>
