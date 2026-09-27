@@ -804,3 +804,58 @@ User reported that "Development Notes" text in the hero section heading was not 
 - **No unresolved bugs** — "Development Notes" is now visible in both light and dark mode, hero section redesigned
 - The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
 - Author name "Ketan Kore" remains intentionally absent per user request
+
+---
+Task ID: USER-4
+Agent: Z.ai Code
+Task: Production-ready customizations + push to GitHub org learnwebstack/learnwebstack
+
+## Current Project Status Description / Assessment
+User requested: (1) remove font increase/decrease icon from navbar, (2) remove keyboard button for searching, (3) add actual GitHub link, (4) make production-ready, (5) create repo named "learnwebstack" under the user's organization "learnwebstack" and push code.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### UI Changes
+1. **Removed FontSizeControl** from the header navbar — the A-/A/A+ button and its import are gone
+2. **Removed keyboard shortcuts button** from the header navbar — the Keyboard icon button and `onShortcutsOpen` prop are gone (ShortcutsHelp component kept but no longer triggered from header; `?` keyboard shortcut still works)
+3. **Updated GitHub link** — now points to `https://github.com/akram6t/learnwebstack` (was generic `https://github.com`)
+4. **Removed `onShortcutsOpen` prop** from Header interface and AppContent usage
+
+### Production-Ready Customizations
+- **Metadata updated** in layout.tsx:
+  - `siteUrl` → `https://learnwebstack.vercel.app`
+  - `authors` → `[{ name: "akram6t", url: "https://github.com/akram6t" }]`
+  - `creator` → `"akram6t"`
+  - `publisher` → `"learnwebstack"`
+  - Added keywords: "learn web development", "learnwebstack"
+- **Sitemap** updated with production URL
+- **robots.txt** updated with production sitemap URL
+- **README.md** created with full documentation: overview, curriculum table, features list, tech stack, getting started, project structure, content structure, keyboard shortcuts, deployment guide, license, links
+- **.gitignore** updated with database, IDE, and OS file exclusions
+
+### GitHub Push
+- Verified the "learnwebstack" organization exists (ID: 334725856)
+- Created repository "learnwebstack" under the org via GitHub API:
+  - URL: https://github.com/learnwebstack/learnwebstack
+  - Description, homepage, public visibility set
+- Configured git: user.name=akram6t, user.email=akram6t@users.noreply.github.com
+- Added remote with token authentication (temporarily)
+- Committed production-ready changes (7 files, 201 insertions)
+- Pushed all commits to main branch successfully
+- **Removed token from remote URL** after push for security
+- Verified: repo exists, commits visible (including latest "Production-ready" commit)
+
+### Verification Results
+- ESLint: 0 errors ✓
+- All routes return 200: /, /?day=1, /?day=7, /?day=17 ✓
+- agent-browser confirmed: fontSizeControl=false, keyboardShortcutsBtn=false, githubLink="https://github.com/akram6t/learnwebstack", homeBtn=true, themeToggle=true ✓
+- GitHub repo confirmed: learnwebstack/learnwebstack, main branch, commits pushed ✓
+- No secrets/tokens in committed files ✓
+- Token removed from git remote URL ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — site is production-ready and pushed to GitHub
+- The GitHub Personal Access Token used for the push has been removed from the remote URL; for future pushes, configure a credential helper or SSH key
+- To deploy to Vercel: import the repo at vercel.com/new, no env vars required
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content that can be replaced
+- Author name "Ketan Kore" remains intentionally absent per user request
