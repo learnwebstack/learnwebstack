@@ -1,11 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  oneDark,
-  oneLight,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
 import { Check, Copy, Download, Terminal } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -77,124 +72,15 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
     URL.revokeObjectURL(url);
   };
 
-  const lang = language === "text" || language === "bash" ? "bash" : language;
   const label = languageLabels[language] || language.toUpperCase();
   const badgeColor = languageColors[language] || languageColors.text;
   const isTerminal = language === "bash" || language === "text";
+  const isDark = resolvedTheme === "dark";
 
-  // Custom style overrides for better contrast
-  const customStyle = {
-    margin: 0,
-    padding: "1.125rem 1.25rem",
-    background: "transparent",
-    fontSize: "0.8125rem",
-    lineHeight: "1.75",
-  };
-
-  // Override syntax highlighter colors for better contrast (comments, strings, etc.)
-  const themeOverride = {
-    ...(resolvedTheme === "dark" ? oneDark : oneLight),
-    'code[class*="language-"]': {
-      ...(resolvedTheme === "dark" ? oneDark : oneLight)['code[class*="language-"]'],
-      color: resolvedTheme === "dark" ? "#e2e8f0" : "#1e293b",
-    },
-    'pre[class*="language-"]': {
-      ...(resolvedTheme === "dark" ? oneDark : oneLight)['pre[class*="language-"]'],
-      background: "transparent",
-    },
-    comment: {
-      color: resolvedTheme === "dark" ? "#94a3b8" : "#64748b",
-      fontStyle: "italic" as const,
-    },
-    prolog: {
-      color: resolvedTheme === "dark" ? "#94a3b8" : "#64748b",
-      fontStyle: "italic" as const,
-    },
-    doctype: {
-      color: resolvedTheme === "dark" ? "#94a3b8" : "#64748b",
-      fontStyle: "italic" as const,
-    },
-    cdata: {
-      color: resolvedTheme === "dark" ? "#94a3b8" : "#64748b",
-      fontStyle: "italic" as const,
-    },
-    punctuation: {
-      color: resolvedTheme === "dark" ? "#cbd5e1" : "#475569",
-    },
-    property: {
-      color: resolvedTheme === "dark" ? "#7dd3fc" : "#0284c7",
-    },
-    tag: {
-      color: resolvedTheme === "dark" ? "#fca5a5" : "#dc2626",
-    },
-    boolean: {
-      color: resolvedTheme === "dark" ? "#fbbf24" : "#d97706",
-    },
-    number: {
-      color: resolvedTheme === "dark" ? "#fbbf24" : "#d97706",
-    },
-    constant: {
-      color: resolvedTheme === "dark" ? "#fbbf24" : "#d97706",
-    },
-    symbol: {
-      color: resolvedTheme === "dark" ? "#fbbf24" : "#d97706",
-    },
-    selector: {
-      color: resolvedTheme === "dark" ? "#86efac" : "#16a34a",
-    },
-    "attr-name": {
-      color: resolvedTheme === "dark" ? "#7dd3fc" : "#0284c7",
-    },
-    string: {
-      color: resolvedTheme === "dark" ? "#86efac" : "#16a34a",
-    },
-    char: {
-      color: resolvedTheme === "dark" ? "#86efac" : "#16a34a",
-    },
-    builtin: {
-      color: resolvedTheme === "dark" ? "#fde68a" : "#b45309",
-    },
-    inserted: {
-      color: resolvedTheme === "dark" ? "#86efac" : "#16a34a",
-    },
-    operator: {
-      color: resolvedTheme === "dark" ? "#e2e8f0" : "#1e293b",
-    },
-    entity: {
-      color: resolvedTheme === "dark" ? "#f0abfc" : "#c026d3",
-    },
-    url: {
-      color: resolvedTheme === "dark" ? "#7dd3fc" : "#0284c7",
-    },
-    variable: {
-      color: resolvedTheme === "dark" ? "#fda4af" : "#be123c",
-    },
-    "function-variable": {
-      color: resolvedTheme === "dark" ? "#fde68a" : "#b45309",
-    },
-    function: {
-      color: resolvedTheme === "dark" ? "#fde68a" : "#b45309",
-    },
-    keyword: {
-      color: resolvedTheme === "dark" ? "#f0abfc" : "#c026d3",
-    },
-    atrule: {
-      color: resolvedTheme === "dark" ? "#f0abfc" : "#c026d3",
-    },
-    "attr-value": {
-      color: resolvedTheme === "dark" ? "#86efac" : "#16a34a",
-    },
-    class: {
-      color: resolvedTheme === "dark" ? "#fde68a" : "#b45309",
-    },
-    regex: {
-      color: resolvedTheme === "dark" ? "#fbbf24" : "#d97706",
-    },
-    important: {
-      color: resolvedTheme === "dark" ? "#fca5a5" : "#dc2626",
-      fontWeight: "bold" as const,
-    },
-  };
+  // Plain monochrome code — no syntax highlighting colors per token
+  const codeColor = isDark ? "#e2e8f0" : "#1e293b";
+  const showLineNumbers = code.split("\n").length > 4;
+  const lines = code.split("\n");
 
   return (
     <div className="group relative my-6 overflow-hidden rounded-xl border bg-card shadow-sm transition-shadow hover:shadow-md">
@@ -252,29 +138,43 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
           </Button>
         </div>
       </div>
-      {/* Code */}
+      {/* Code — plain monochrome, no per-line background effects */}
       <div className="overflow-x-auto scrollbar-thin">
-        <SyntaxHighlighter
-          language={lang}
-          style={themeOverride}
-          customStyle={customStyle}
-          codeTagProps={{
-            style: {
-              fontFamily: "var(--font-geist-mono), monospace",
-            },
-          }}
-          showLineNumbers={code.split("\n").length > 4}
-          lineNumberStyle={{
-            color: "var(--muted-foreground)",
-            opacity: 0.4,
-            paddingRight: "1.25em",
-            minWidth: "2.5em",
-            userSelect: "none",
-          }}
-          wrapLongLines={false}
+        <pre
+          className="m-0 p-[1.125rem_1.25rem] text-[0.8125rem] leading-[1.75]"
+          style={{ background: "transparent" }}
         >
-          {code}
-        </SyntaxHighlighter>
+          <code
+            className="font-mono"
+            style={{
+              fontFamily: "var(--font-geist-mono), monospace",
+              color: codeColor,
+              background: "transparent",
+            }}
+          >
+            {showLineNumbers ? (
+              lines.map((line, i) => (
+                <span key={i} className="table-row">
+                  <span
+                    className="table-cell select-none pr-[1.25em] text-right"
+                    style={{
+                      color: "var(--muted-foreground)",
+                      opacity: 0.4,
+                      minWidth: "2.5em",
+                    }}
+                  >
+                    {i + 1}
+                  </span>
+                  <span className="table-cell whitespace-pre">
+                    {line || " "}
+                  </span>
+                </span>
+              ))
+            ) : (
+              <span className="whitespace-pre">{code}</span>
+            )}
+          </code>
+        </pre>
       </div>
     </div>
   );

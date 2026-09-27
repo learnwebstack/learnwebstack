@@ -697,3 +697,37 @@ The project is a 17-day Full Stack Web Development documentation website (Next.j
   4. Add a weekly progress chart/heatmap visualization showing study activity
   5. Add a dedicated "Favorites" view/modal showing all starred sections in one place (currently limited to 6 in sidebar)
   6. Add a total study time summary in the sidebar (aggregate of all day study times)
+
+---
+Task ID: USER-1
+Agent: Z.ai Code
+Task: Remove syntax highlighting (light effect) from all code blocks per user request
+
+## Current Project Status Description / Assessment
+User requested removing the "background effect like light effect on each line of code" from all code editors/blocks in the website. This was the syntax highlighting — the per-token coloring (green strings, purple keywords, yellow functions, etc.) from react-syntax-highlighter's oneDark/oneLight themes that made each code line look colorful/lit up.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### Changes Made
+- Rewrote `/src/components/docs/code-block.tsx` to completely remove the `react-syntax-highlighter` Prism component and its theme overrides
+- Replaced with plain `<pre><code>` rendering using a single uniform text color:
+  - Light mode: `#1e293b` (dark slate)
+  - Dark mode: `#e2e8f0` (light slate)
+- Code is now plain monochrome — no per-token colors, no light effects on lines
+- Preserved all existing functionality: code block container with border/shadow, header bar with traffic-light dots/terminal icon, filename, language badge, copy button, download button, line numbers (for blocks >4 lines)
+- Line numbers rendered via table-row/table-cell spans with muted color and 40% opacity
+- Removed unused imports: `Prism`, `SyntaxHighlighter`, `oneDark`, `oneLight` from react-syntax-highlighter
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=3, /?day=7, /?day=9, /?day=13, /?day=17 ✓
+- VLM confirmed (Day 3, light mode): "code text is all one uniform color (plain monochrome). No syntax highlighting present. No distinct colors for tags, attributes, strings, or keywords." ✓
+- VLM confirmed (Day 3, dark mode): "code text is all one color (plain monochrome). No syntax highlighting colors used." ✓
+- VLM confirmed (Day 7, JS code): "code text is all ONE uniform color with no syntax highlighting. Keywords (var, let, const), variables, and strings all in the same single color." ✓
+- DOM verification: codeColor = rgb(30, 41, 59) (single uniform color), no `.token` class elements from syntax highlighter ✓
+- No console errors ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — code blocks now render as plain monochrome text per user request
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
+- Author name "Ketan Kore" remains intentionally absent per user request
