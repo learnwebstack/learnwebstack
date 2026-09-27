@@ -121,6 +121,25 @@ export function AppContent() {
         }
         return;
       }
+      // / → focus the TOC filter input (day pages only)
+      if (
+        e.key === "/" &&
+        !isTyping &&
+        !e.metaKey &&
+        !e.ctrlKey &&
+        !e.altKey &&
+        currentDay
+      ) {
+        e.preventDefault();
+        const tocInput = document.querySelector(
+          "input[aria-label='Filter table of contents']"
+        ) as HTMLInputElement | null;
+        if (tocInput) {
+          tocInput.focus();
+          tocInput.select();
+        }
+        return;
+      }
       // g then h → home; g then ←/→ → prev/next day
       if (!isTyping && !e.metaKey && !e.ctrlKey && !e.altKey) {
         if (e.key === "g" || e.key === "G") {

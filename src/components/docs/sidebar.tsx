@@ -7,6 +7,7 @@ import {
   ChevronDown,
   RotateCcw,
   Trophy,
+  Flame,
 } from "lucide-react";
 import { allDays } from "@/data/days";
 import type { DayContent } from "@/data/types";
@@ -44,6 +45,46 @@ export function DocsSidebar({
   onSelectDay,
 }: SidebarProps) {
   const progress = Math.round((completedDays.size / allDays.length) * 100);
+
+  // Reading streak: consecutive days the user has visited the site
+  const [streak, setStreak] = React.useState(0);
+  React.useEffect(() => {
+    try {
+      const today = new Date();
+      const todayStr = today.toDateString();
+      const lastVisit = localStorage.getItem("last-visit-date");
+      const visitDates: string[] = JSON.parse(
+        localStorage.getItem("visit-dates") || "[]"
+      );
+      // Only record today if not already recorded
+      if (lastVisit !== todayStr) {
+        visitDates.push(todayStr);
+        // Keep only last 30 days
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - 30);
+        const filtered = visitDates.filter(
+          (d) => new Date(d) >= cutoff
+        );
+        localStorage.setItem("visit-dates", JSON.stringify(filtered));
+        localStorage.setItem("last-visit-date", todayStr);
+      }
+      // Calculate streak from visit-dates
+      const allDates = JSON.parse(
+        localStorage.getItem("visit-dates") || "[]"
+      ) as string[];
+      const dateSet = new Set(allDates);
+      let streakCount = 0;
+      const checkDate = new Date();
+      // Walk backwards from today
+      while (dateSet.has(checkDate.toDateString())) {
+        streakCount++;
+        checkDate.setDate(checkDate.getDate() - 1);
+      }
+      setStreak(streakCount);
+    } catch {
+      /* noop */
+    }
+  }, []);
 
   // Group days by track
   const grouped = React.useMemo(() => {
@@ -108,6 +149,18 @@ export function DocsSidebar({
             style={{ width: `${progress}%` }}
           />
         </div>
+        {/* Reading streak */}
+        {streak > 0 && (
+          <div className="mt-3 flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500/10 to-amber-500/10 px-3 py-2">
+            <Flame className="h-4 w-4 text-orange-500" />
+            <span className="text-xs font-medium text-foreground">
+              {streak}-day streak
+            </span>
+            <span className="ml-auto text-[10px] text-muted-foreground">
+              {streak >= 7 ? "🔥 On fire!" : streak >= 3 ? "Keep going!" : "Nice start!"}
+            </span>
+          </div>
+        )}
       </div>
 
       <ScrollArea className="flex-1 px-2">
@@ -210,10 +263,14 @@ export function DocsSidebar({
               localStorage.removeItem(`bookmark-day-${d}`);
             }
             localStorage.removeItem("recent-days");
+            localStorage.removeItem("recent-days-timestamps");
+            localStorage.removeItem("visit-dates");
+            localStorage.removeItem("last-visit-date");
             // Dispatch all change events so UI updates reactively
             window.dispatchEvent(new Event("completed-days-changed"));
             window.dispatchEvent(new Event("bookmark-changed"));
             window.dispatchEvent(new Event("recent-days-changed"));
+            setStreak(0);
           }}
         >
           <RotateCcw className="h-3.5 w-3.5" />

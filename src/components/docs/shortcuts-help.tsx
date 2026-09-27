@@ -34,6 +34,7 @@ const shortcuts: Shortcut[] = [
   { keys: ["⌘", "B"], description: "Toggle theme", icon: Sun },
   { keys: ["?"], description: "Show this help", icon: Keyboard },
   { keys: ["J"], description: "Jump to day (home only)", icon: ListOrdered },
+  { keys: ["/"], description: "Filter sections (day pages)", icon: Search },
   { keys: ["G", "H"], description: "Go to home page", icon: Home },
   { keys: ["G", "←"], description: "Previous day", icon: ArrowLeft },
   { keys: ["G", "→"], description: "Next day", icon: ArrowRight },

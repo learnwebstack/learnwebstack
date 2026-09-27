@@ -19,6 +19,8 @@ import {
   Check,
   PartyPopper,
   Trophy,
+  Home,
+  ChevronRight,
 } from "lucide-react";
 import type { DayContent } from "@/data/types";
 import { getAdjacentDays, allDays } from "@/data/days";
@@ -139,16 +141,20 @@ export function DayView({
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
+      <nav
+        className="mb-6 flex items-center gap-1.5 text-sm text-muted-foreground"
+        aria-label="Breadcrumb"
+      >
         <button
           onClick={onBackHome}
-          className="hover:text-foreground transition-colors"
+          className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-muted hover:text-foreground transition-colors"
         >
+          <Home className="h-3.5 w-3.5" />
           Course
         </button>
-        <span>/</span>
+        <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
         <span className="font-mono text-xs">{day.date}</span>
-        <span>/</span>
+        <ChevronRight className="h-3 w-3 text-muted-foreground/50" />
         <span className="text-foreground truncate">{day.title}</span>
       </nav>
 
@@ -310,14 +316,19 @@ export function DayView({
           {/* Topics overview */}
           <div className="mb-8">
             <div className="mb-3 flex items-center gap-2">
-              <ListChecks className="h-4 w-4 text-primary" />
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
+                <ListChecks className="h-3.5 w-3.5 text-primary" />
+              </div>
               <h3 className="text-sm font-semibold">Topics Covered</h3>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                {day.topics.length}
+              </span>
             </div>
             <div className="flex flex-wrap gap-2">
               {day.topics.map((topic, i) => (
                 <span
                   key={i}
-                  className="rounded-lg border bg-card px-3 py-1.5 text-xs font-medium"
+                  className="rounded-lg border bg-card px-3 py-1.5 text-xs font-medium transition-colors hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
                 >
                   {topic}
                 </span>
