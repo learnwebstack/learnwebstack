@@ -8,6 +8,7 @@ const PROGRESS_KEYS = [
   "visit-dates",
   "last-visit-date",
   "font-size",
+  "favorite-sections",
 ] as const;
 
 // Bookmark keys follow the pattern `bookmark-day-{N}`

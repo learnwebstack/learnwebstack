@@ -10,6 +10,7 @@ import {
   Flame,
   Download,
   Upload,
+  Star,
 } from "lucide-react";
 import { allDays } from "@/data/days";
 import type { DayContent } from "@/data/types";
@@ -23,6 +24,18 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { useToast } from "@/hooks/use-toast";
+
+// Build a lookup of section ID → {day, heading} for favorite section display
+const sectionLookup = new Map<string, { day: number; dayTitle: string; heading: string }>();
+for (const day of allDays) {
+  for (const section of day.sections) {
+    sectionLookup.set(section.id, {
+      day: day.day,
+      dayTitle: day.title,
+      heading: section.heading,
+    });
+  }
+}
 
 interface SidebarProps {
   currentDay: number | null;
@@ -90,6 +103,35 @@ export function DocsSidebar({
     } catch {
       /* noop */
     }
+  }, []);
+
+  // Favorite sections
+  const [favoriteSectionIds, setFavoriteSectionIds] = React.useState<string[]>([]);
+  React.useEffect(() => {
+    try {
+      const favorites = JSON.parse(
+        localStorage.getItem("favorite-sections") || "[]"
+      ) as string[];
+      setFavoriteSectionIds(favorites);
+    } catch {
+      /* noop */
+    }
+    const handler = () => {
+      try {
+        const favorites = JSON.parse(
+          localStorage.getItem("favorite-sections") || "[]"
+        ) as string[];
+        setFavoriteSectionIds(favorites);
+      } catch {
+        /* noop */
+      }
+    };
+    window.addEventListener("favorite-sections-changed", handler);
+    window.addEventListener("storage", handler);
+    return () => {
+      window.removeEventListener("favorite-sections-changed", handler);
+      window.removeEventListener("storage", handler);
+    };
   }, []);
 
   // Group days by track
@@ -170,6 +212,44 @@ export function DocsSidebar({
       </div>
 
       <ScrollArea className="flex-1 px-2">
+        {/* Favorite sections panel */}
+        {favoriteSectionIds.length > 0 && (
+          <div className="mb-3 mt-2 rounded-lg border bg-amber-500/5 p-2.5">
+            <div className="mb-2 flex items-center gap-1.5 px-1">
+              <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                Favorites
+              </span>
+              <span className="ml-auto rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                {favoriteSectionIds.length}
+              </span>
+            </div>
+            <div className="space-y-0.5">
+              {favoriteSectionIds.slice(0, 6).map((secId) => {
+                const info = sectionLookup.get(secId);
+                if (!info) return null;
+                return (
+                  <button
+                    key={secId}
+                    onClick={() => onSelectDay(info.day)}
+                    className="group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-xs transition-colors hover:bg-amber-500/10"
+                  >
+                    <Star className="h-3 w-3 shrink-0 fill-amber-500 text-amber-500" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium group-hover:text-primary">
+                        {info.heading}
+                      </p>
+                      <p className="truncate text-[10px] text-muted-foreground">
+                        Day {String(info.day).padStart(2, "0")} · {info.dayTitle}
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         <div className="py-2 space-y-1">
           {grouped.map(({ track, days }) => {
             const isOpen = openGroups.has(track);
@@ -306,6 +386,7 @@ export function DocsSidebar({
                   window.dispatchEvent(new Event("completed-days-changed"));
                   window.dispatchEvent(new Event("bookmark-changed"));
                   window.dispatchEvent(new Event("recent-days-changed"));
+                  window.dispatchEvent(new Event("favorite-sections-changed"));
                   // Reload streak
                   const allDates = JSON.parse(
                     localStorage.getItem("visit-dates") || "[]"
@@ -353,10 +434,12 @@ export function DocsSidebar({
             localStorage.removeItem("recent-days-timestamps");
             localStorage.removeItem("visit-dates");
             localStorage.removeItem("last-visit-date");
+            localStorage.removeItem("favorite-sections");
             // Dispatch all change events so UI updates reactively
             window.dispatchEvent(new Event("completed-days-changed"));
             window.dispatchEvent(new Event("bookmark-changed"));
             window.dispatchEvent(new Event("recent-days-changed"));
+            window.dispatchEvent(new Event("favorite-sections-changed"));
             setStreak(0);
             toast({
               title: "All data reset",
