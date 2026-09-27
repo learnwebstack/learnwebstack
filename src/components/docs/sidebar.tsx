@@ -8,10 +8,13 @@ import {
   RotateCcw,
   Trophy,
   Flame,
+  Download,
+  Upload,
 } from "lucide-react";
 import { allDays } from "@/data/days";
 import type { DayContent } from "@/data/types";
 import { cn } from "@/lib/utils";
+import { downloadProgressJSON, importProgress } from "@/lib/progress-data";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +22,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { useToast } from "@/hooks/use-toast";
 
 interface SidebarProps {
   currentDay: number | null;
@@ -45,6 +49,8 @@ export function DocsSidebar({
   onSelectDay,
 }: SidebarProps) {
   const progress = Math.round((completedDays.size / allDays.length) * 100);
+  const { toast } = useToast();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   // Reading streak: consecutive days the user has visited the site
   const [streak, setStreak] = React.useState(0);
@@ -251,7 +257,88 @@ export function DocsSidebar({
         </div>
       </ScrollArea>
 
-      <div className="border-t p-3">
+      <div className="border-t p-3 space-y-2">
+        {/* Export / Import buttons */}
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 text-xs text-muted-foreground"
+            onClick={() => {
+              downloadProgressJSON();
+              toast({
+                title: "Progress exported!",
+                description: "Your progress data has been downloaded as a JSON file.",
+                duration: 3000,
+              });
+            }}
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5 text-xs text-muted-foreground"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className="h-3.5 w-3.5" />
+            Import
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              if (!file) return;
+              try {
+                const text = await file.text();
+                const result = importProgress(text);
+                if (result.success) {
+                  toast({
+                    title: "Progress imported!",
+                    description: `Restored ${result.count} data entries successfully.`,
+                    duration: 4000,
+                  });
+                  // Dispatch all change events to refresh UI
+                  window.dispatchEvent(new Event("completed-days-changed"));
+                  window.dispatchEvent(new Event("bookmark-changed"));
+                  window.dispatchEvent(new Event("recent-days-changed"));
+                  // Reload streak
+                  const allDates = JSON.parse(
+                    localStorage.getItem("visit-dates") || "[]"
+                  ) as string[];
+                  const dateSet = new Set(allDates);
+                  let streakCount = 0;
+                  const checkDate = new Date();
+                  while (dateSet.has(checkDate.toDateString())) {
+                    streakCount++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                  }
+                  setStreak(streakCount);
+                } else {
+                  toast({
+                    title: "Import failed",
+                    description: result.error || "Could not parse the file.",
+                    duration: 4000,
+                  });
+                }
+              } catch {
+                toast({
+                  title: "Import failed",
+                  description: "Could not read the file.",
+                  duration: 4000,
+                });
+              }
+              // Reset input so the same file can be re-selected
+              e.target.value = "";
+            }}
+          />
+        </div>
+
+        {/* Reset button */}
         <Button
           variant="outline"
           size="sm"
@@ -271,6 +358,11 @@ export function DocsSidebar({
             window.dispatchEvent(new Event("bookmark-changed"));
             window.dispatchEvent(new Event("recent-days-changed"));
             setStreak(0);
+            toast({
+              title: "All data reset",
+              description: "Your progress, bookmarks, and history have been cleared.",
+              duration: 3000,
+            });
           }}
         >
           <RotateCcw className="h-3.5 w-3.5" />

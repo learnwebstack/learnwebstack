@@ -659,23 +659,43 @@ export function HomePage({
       </section>
 
       {/* CTA */}
-      <section className="border-t">
-        <div className="mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
+      <section className="relative overflow-hidden border-t bg-gradient-to-br from-primary/5 via-chart-2/5 to-chart-3/5">
+        {/* Decorative blurred orbs */}
+        <div className="absolute -left-20 top-0 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -right-20 bottom-0 h-64 w-64 rounded-full bg-chart-2/10 blur-3xl" />
+        <div className="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 lg:px-8">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-chart-2 shadow-lg">
+            <GraduationCap className="h-8 w-8 text-primary-foreground" />
+          </div>
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
             Ready to start building?
           </h2>
-          <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+          <p className="mx-auto mt-3 max-w-xl text-base leading-relaxed text-muted-foreground">
             Dive into Day 01 and begin your journey to becoming a full-stack web
             developer. Every expert was once a beginner.
           </p>
-          <Button
-            size="lg"
-            className="mt-6 h-12 gap-2 px-6 text-base"
-            onClick={() => onSelectDay(1)}
-          >
-            Start with Day 01
-            <ArrowRight className="h-4 w-4" />
-          </Button>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Button
+              size="lg"
+              className="h-12 gap-2 px-8 text-base shadow-md transition-all hover:scale-105 hover:shadow-lg"
+              onClick={() => onSelectDay(1)}
+            >
+              Start with Day 01
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-12 gap-2 px-6 text-base"
+              onClick={onSearchOpen}
+            >
+              <Search className="h-4 w-4" />
+              Browse Topics
+            </Button>
+          </div>
+          <p className="mt-6 text-xs text-muted-foreground">
+            Free · No sign-up required · {courseStats.totalReadingMinutes >= 60 ? `${Math.round(courseStats.totalReadingMinutes / 60)} hour` : `${courseStats.totalReadingMinutes} min`} of content
+          </p>
         </div>
       </section>
     </div>

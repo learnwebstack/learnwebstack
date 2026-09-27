@@ -3,13 +3,13 @@ import { courseStats, allDays } from "@/data/days";
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t bg-muted/30">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <footer className="mt-auto border-t bg-gradient-to-b from-muted/30 to-muted/50">
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-chart-2 text-primary-foreground">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-chart-2 text-primary-foreground shadow-sm">
                 <BookOpen className="h-5 w-5" />
               </div>
               <div>
@@ -19,11 +19,22 @@ export function Footer() {
                 </p>
               </div>
             </div>
-            <p className="mt-4 max-w-md text-sm text-muted-foreground">
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-muted-foreground">
               A comprehensive {courseStats.totalDays}-day journey through modern
               web development — from HTML basics to full-stack deployment.
               Structured, searchable, and built for learning.
             </p>
+            {/* Tech badges */}
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {["Next.js", "TypeScript", "Tailwind CSS", "shadcn/ui"].map((tech) => (
+                <span
+                  key={tech}
+                  className="rounded-md border bg-background px-2 py-0.5 text-[10px] font-medium text-muted-foreground"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
           </div>
 
           {/* Stats */}
@@ -93,10 +104,10 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t pt-6 sm:flex-row">
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t pt-6 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Full Stack Course Notes. Built with
-            Next.js & Tailwind CSS.
+            © {new Date().getFullYear()} Full Stack Course Notes · Built with
+            Next.js & Tailwind CSS
           </p>
           <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
             Made with <Heart className="h-3 w-3 fill-red-500 text-red-500" /> for
