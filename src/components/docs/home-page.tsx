@@ -151,26 +151,30 @@ export function HomePage({
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative overflow-hidden border-b">
-        {/* Background pattern */}
-        <div className="absolute inset-0 grid-pattern opacity-40" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background" />
-        <div className="absolute -top-24 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl" />
+      <section className="relative overflow-hidden border-b bg-gradient-to-b from-primary/5 via-background to-background">
+        {/* Decorative background elements */}
+        <div className="absolute inset-0 dot-pattern opacity-30" />
+        <div className="absolute -left-32 top-10 h-72 w-72 rounded-full bg-primary/15 blur-3xl" />
+        <div className="absolute -right-32 top-20 h-72 w-72 rounded-full bg-chart-2/15 blur-3xl" />
+        <div className="absolute left-1/2 top-0 h-1 w-full -translate-x-1/2 bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
 
         <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
           <div className="mx-auto max-w-3xl text-center">
-            <Badge
-              variant="outline"
-              className="mb-6 gap-1.5 rounded-full px-4 py-1.5 text-xs font-medium"
-            >
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border bg-card/80 px-4 py-1.5 text-xs font-medium shadow-sm backdrop-blur">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
+              </span>
               <Sparkles className="h-3 w-3 text-primary" />
               {courseStats.totalDays}-Day Complete Course
-            </Badge>
+            </div>
 
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              Full Stack Web
+            <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+              <span className="text-foreground">Full Stack Web</span>
               <br />
-              <span className="gradient-text">Development Notes</span>
+              <span className="bg-gradient-to-r from-primary via-chart-2 to-chart-3 bg-clip-text text-transparent">
+                Development Notes
+              </span>
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-muted-foreground">
@@ -183,7 +187,7 @@ export function HomePage({
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button
                 size="lg"
-                className="h-12 gap-2 px-6 text-base"
+                className="h-12 gap-2 px-8 text-base shadow-md transition-all hover:scale-105 hover:shadow-lg"
                 onClick={() =>
                   onSelectDay(
                     completedDays.size > 0
@@ -198,7 +202,7 @@ export function HomePage({
               <Button
                 size="lg"
                 variant="outline"
-                className="h-12 gap-2 px-6 text-base"
+                className="h-12 gap-2 px-6 text-base bg-card/80 backdrop-blur"
                 onClick={onSearchOpen}
               >
                 <Search className="h-4 w-4" />

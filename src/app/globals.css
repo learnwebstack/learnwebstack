@@ -155,12 +155,13 @@
     background: linear-gradient(
       135deg,
       var(--primary) 0%,
-      oklch(0.60 0.12 184) 50%,
-      oklch(0.55 0.10 260) 100%
+      var(--chart-2) 50%,
+      var(--chart-3) 100%
     );
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    color: var(--primary);
   }
 
   .grid-pattern {

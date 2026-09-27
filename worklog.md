@@ -770,3 +770,37 @@ User clarified the previous request: they want the syntax highlighting colors ba
 - **No unresolved bugs** — code blocks now have syntax highlighting colors with no per-line background/light effect, exactly as user requested
 - The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
 - Author name "Ketan Kore" remains intentionally absent per user request
+
+---
+Task ID: USER-3
+Agent: Z.ai Code
+Task: Fix invisible "Development Notes" text in hero + redesign hero section style
+
+## Current Project Status Description / Assessment
+User reported that "Development Notes" text in the hero section heading was not visible. The root cause was the `.gradient-text` CSS class using `oklch()` colors directly in the gradient (instead of CSS variables) combined with `-webkit-text-fill-color: transparent`, which failed to render the gradient as text fill in the browser context. User also requested a style change for the hero section.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### Bug Fixed
+- **"Development Notes" invisible**: The `.gradient-text` utility used hardcoded `oklch()` color values in the gradient which didn't resolve properly. Fixed by:
+  1. Replacing the hero heading's `gradient-text` class with Tailwind's `bg-gradient-to-r from-primary via-chart-2 to-chart-3 bg-clip-text text-transparent` utilities (more reliable rendering)
+  2. Updated the `.gradient-text` CSS utility to use CSS variables (`var(--primary)`, `var(--chart-2)`, `var(--chart-3)`) instead of hardcoded oklch values, and added a `color: var(--primary)` fallback
+
+### Hero Section Redesigned
+- **Background**: Changed from `grid-pattern` to a soft gradient `bg-gradient-to-b from-primary/5 via-background to-background` with `dot-pattern` overlay (opacity-30) and two decorative blurred orbs (primary/15 left, chart-2/15 right) plus a top accent line gradient
+- **Badge**: Replaced shadcn Badge with a custom pill badge featuring a pulsing green dot (animate-ping), sparkle icon, glassmorphism (bg-card/80 backdrop-blur), and shadow-sm
+- **Heading**: Changed from `font-bold` to `font-extrabold`; "Full Stack Web" uses `text-foreground` (solid), "Development Notes" uses reliable Tailwind gradient clip utilities
+- **Buttons**: Primary button now has `shadow-md hover:scale-105 hover:shadow-lg` and wider padding (px-8); secondary button has `bg-card/80 backdrop-blur` glassmorphism
+- **Stats grid and progress bar**: Preserved from previous design
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=7, /?day=17 ✓
+- VLM confirmed (light mode): "'Development Notes' is fully visible with a gradient color transitioning from teal/greenish-blue to slate blue/indigo; modern minimalist design with ample whitespace"
+- VLM confirmed (dark mode): "'Development Notes' clearly visible with gradient from vibrant teal/green to soft blue/purple; bright gradient stands out sharply against dark background, ensuring high readability"
+- No console errors ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — "Development Notes" is now visible in both light and dark mode, hero section redesigned
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
+- Author name "Ketan Kore" remains intentionally absent per user request
