@@ -205,11 +205,19 @@ export function DocsSidebar({
           className="w-full gap-2 text-muted-foreground"
           onClick={() => {
             localStorage.removeItem("completed-days");
+            // Remove all bookmark entries
+            for (let d = 1; d <= allDays.length; d++) {
+              localStorage.removeItem(`bookmark-day-${d}`);
+            }
+            localStorage.removeItem("recent-days");
+            // Dispatch all change events so UI updates reactively
             window.dispatchEvent(new Event("completed-days-changed"));
+            window.dispatchEvent(new Event("bookmark-changed"));
+            window.dispatchEvent(new Event("recent-days-changed"));
           }}
         >
           <RotateCcw className="h-3.5 w-3.5" />
-          Reset Progress
+          Reset All Data
         </Button>
       </div>
     </div>

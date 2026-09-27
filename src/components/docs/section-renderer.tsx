@@ -12,11 +12,12 @@ export function SectionRenderer({ section }: { section: ContentSection }) {
   return (
     <section id={headingId} className="scroll-mt-24">
       {section.level === 3 ? (
-        <h3 className="text-xl font-semibold tracking-tight mt-8 mb-3">
+        <h3 className="group flex items-center gap-2 text-xl font-semibold tracking-tight mt-8 mb-3">
+          <span className="h-4 w-1 rounded-full bg-primary/50" />
           {section.heading}
         </h3>
       ) : (
-        <h2 className="group flex items-center gap-2 text-2xl font-bold tracking-tight mt-12 mb-4">
+        <h2 className="group flex items-center gap-2 text-2xl font-bold tracking-tight mt-12 mb-4 border-b pb-2">
           {section.heading}
           <a
             href={`#${headingId}`}

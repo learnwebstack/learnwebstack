@@ -15,6 +15,8 @@ import {
   ExternalLink,
   ListTodo,
   Printer,
+  Share2,
+  Check,
 } from "lucide-react";
 import type { DayContent } from "@/data/types";
 import { getAdjacentDays } from "@/data/days";
@@ -43,6 +45,7 @@ export function DayView({
   const { previous, next } = getAdjacentDays(day.day);
   const isCompleted = completedDays.has(day.day);
   const [bookmarked, setBookmarked] = React.useState(false);
+  const [shared, setShared] = React.useState(false);
 
   // Estimate reading time from content word count (~200 wpm)
   const readingTime = React.useMemo(() => {
@@ -78,6 +81,33 @@ export function DayView({
     setBookmarked(newVal);
     localStorage.setItem(`bookmark-day-${day.day}`, String(newVal));
     window.dispatchEvent(new Event("bookmark-changed"));
+  };
+
+  const handleShare = async () => {
+    const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+    const shareData = {
+      title: `${day.date} — ${day.title}`,
+      text: day.subtitle,
+      url: shareUrl,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      }
+    } catch {
+      // User cancelled or clipboard failed — try clipboard fallback
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      } catch {
+        /* noop */
+      }
+    }
   };
 
   React.useEffect(() => {
@@ -181,11 +211,29 @@ export function DayView({
                 <Printer className="h-4 w-4" />
                 Print
               </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleShare}
+                data-print-hidden
+              >
+                {shared ? (
+                  <>
+                    <Check className="h-4 w-4 text-emerald-500" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="h-4 w-4" />
+                    Share
+                  </>
+                )}
+              </Button>
             </div>
           </header>
 
           {/* Description */}
-          <div className="mb-8 rounded-xl bg-muted/40 p-5">
+          <div className="mb-8 rounded-xl border-l-4 border-primary/40 bg-muted/30 p-5">
             <p className="text-base leading-relaxed text-foreground">
               {day.description}
             </p>
@@ -193,9 +241,11 @@ export function DayView({
 
           {/* Learning objectives & Prerequisites */}
           <div className="mb-8 grid gap-4 sm:grid-cols-2">
-            <Card className="p-5">
+            <Card className="p-5 transition-shadow hover:shadow-md">
               <div className="mb-3 flex items-center gap-2">
-                <Target className="h-4 w-4 text-primary" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
+                  <Target className="h-3.5 w-3.5 text-primary" />
+                </div>
                 <h3 className="text-sm font-semibold">Learning Objectives</h3>
               </div>
               <ul className="space-y-2">
@@ -210,9 +260,11 @@ export function DayView({
                 ))}
               </ul>
             </Card>
-            <Card className="p-5">
+            <Card className="p-5 transition-shadow hover:shadow-md">
               <div className="mb-3 flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-primary" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary/10">
+                  <BookOpen className="h-3.5 w-3.5 text-primary" />
+                </div>
                 <h3 className="text-sm font-semibold">Prerequisites</h3>
               </div>
               <ul className="space-y-2">

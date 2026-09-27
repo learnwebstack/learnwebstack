@@ -54,14 +54,21 @@ export function Callout({ callout }: { callout: CalloutType }) {
   return (
     <div
       className={cn(
-        "my-5 flex gap-3 rounded-xl border-l-4 p-4",
+        "group my-6 flex gap-4 rounded-xl border-l-4 p-5 shadow-sm transition-shadow hover:shadow-md",
         config.container
       )}
     >
-      <Icon className={cn("mt-0.5 h-5 w-5 shrink-0", config.iconClass)} />
+      <div
+        className={cn(
+          "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/60 dark:bg-white/5",
+          config.iconClass
+        )}
+      >
+        <Icon className="h-5 w-5" />
+      </div>
       <div className="min-w-0 flex-1">
         {callout.title && (
-          <p className={cn("mb-1 font-semibold text-sm", config.titleClass)}>
+          <p className={cn("mb-1.5 font-semibold text-sm", config.titleClass)}>
             {callout.title}
           </p>
         )}

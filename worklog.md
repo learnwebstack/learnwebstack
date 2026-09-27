@@ -272,3 +272,59 @@ The project is a 17-day Full Stack Web Development documentation website (Next.j
   4. Add scroll-spy refinement: highlight the current day in the sidebar automatically based on scroll position within long day pages
   5. Add a share button on day pages (copy URL to clipboard / native share API) for easy linking
   6. Consider adding estimated total course time and per-track time in the hero or curriculum header
+
+---
+Task ID: CRON-3
+Agent: Z.ai Code (cron webDevReview round 3)
+Task: QA verification + share button, reset all data, OG image, course time estimate, styling polish
+
+## Current Project Status Description / Assessment
+The project is a 17-day Full Stack Web Development documentation website (Next.js 16 + TypeScript + Tailwind + shadcn/ui). At the start of this round, the site was fully stable: ESLint clean, all routes 200, no runtime errors, with 15 features already implemented across CRON-1 and CRON-2 (collapsible sidebar, progress %, difficulty badges, reading time, back-to-top, keyboard shortcuts, code download, language badges, print styles, scrollbar styling, keyboard navigation, tier separators, jump-to-day dropdown, recently viewed section, bookmarks section). The phase was stable, so this round implemented the next-phase recommendations from CRON-2: share button, reset all data, OG image, course time estimate, and styling polish.
+
+## Current Goals / Completed Modifications / Verification Results
+
+### QA Findings (via agent-browser)
+- Home page: 17 cards render, no console errors ✓
+- Day pages: code blocks, TOC, print button, reading time, callouts all present ✓
+- ESLint: 0 errors ✓
+- All routes (/, /?day=1, /?day=5, /?day=9, /?day=17, /sitemap.xml, SVGs): 200 ✓
+- No regressions from CRON-1 or CRON-2 work
+- VLM identified styling opportunities: callout polish, section heading differentiation, description box accent
+
+### New Features Added
+1. **Share button on day pages** — Added a Share button to the day view action row (next to Print). Uses the Web Share API (`navigator.share`) when available (mobile/modern browsers) with the day title/subtitle/URL; falls back to clipboard copy with a "Copied!" confirmation state (green checkmark, 2-second timeout). Hidden in print mode via `data-print-hidden`.
+
+2. **Reset All Data in sidebar** — Upgraded the previous "Reset Progress" button to "Reset All Data" which now clears ALL user data: completed days, all bookmark entries (iterates days 1–17 removing `bookmark-day-N`), AND recent viewing history. Dispatches three change events (`completed-days-changed`, `bookmark-changed`, `recent-days-changed`) so all UI sections update reactively.
+
+3. **Open Graph preview image** — Generated a custom 1344×768 OG image using the image-generation skill (z-ai CLI) depicting an abstract full-stack web development theme with emerald/slate colors and floating code symbols. Wired up in layout.tsx metadata: `openGraph.images` and `twitter.images` both reference `/og-image.png` with correct dimensions and alt text, enabling rich social media link previews.
+
+4. **Total course reading time estimate** — Added `estimateReadingMinutes()` function in data/days/index.ts that computes reading time from word count (200 wpm, code at 0.5× weight). Aggregated into `courseStats.totalReadingMinutes`. Displayed in the hero stats grid as a 5th card ("Reading Time: 1h") with a Clock icon. Stats grid upgraded from 4-column to 5-column on large screens.
+
+### Styling Improvements
+- **Callouts**: icons now rendered inside a 9×9 rounded background container (`bg-white/60 dark:bg-white/5`) with matching color, giving callouts a more premium card-like appearance; added `shadow-sm hover:shadow-md` transition; increased padding (p-4→p-5) and gap (gap-3→gap-4)
+- **Section headings (h2)**: added `border-b pb-2` bottom border for clear visual separation between sections
+- **Section headings (h3)**: added a small primary-colored vertical accent bar (h-4 w-1 rounded-full) before the heading text
+- **Description box**: upgraded from plain `bg-muted/40` to `border-l-4 border-primary/40 bg-muted/30` for a left accent that ties to the primary color
+- **Learning objectives & prerequisites cards**: icon now rendered in a 7×7 rounded primary-tinted background container; added `hover:shadow-md` transition
+- **Stats cards**: 5-column responsive grid (was 4)
+
+### Verification Results
+- ESLint: 0 errors, 0 warnings ✓
+- All routes return 200: /, /?day=1, /?day=9, /?day=17, /sitemap.xml, /og-image.png, SVG assets ✓
+- agent-browser feature verification: shareBtn=1, printBtn=1, calloutIconBg=4, sectionHeadingsWithBorder=6, descriptionBox has border-l-4 border-primary/40 ✓
+- Home page: statsCards=5, readingTimeStat="1h", ogImageMeta present, twitterImageMeta present ✓
+- OG image served at /og-image.png (107KB, 1344×768) ✓
+- VLM assessment: 9/10 polish — "callout boxes visually polished with distinct colors and clear iconography; description box styled with distinct left accent; high level of design consistency and readability" ✓
+- No console errors during navigation across multiple day pages ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — all features from CRON-1, CRON-2, and CRON-3 work correctly with no regressions
+- The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content
+- Author name "Ketan Kore" remains intentionally absent per user request
+- **Recommended next-phase priorities**:
+  1. Add a dedicated course overview page with a full table of contents listing all 17 days' topics in one view (improves SEO and discoverability)
+  2. Add a font-size adjustment control (A-/A/A+) in the header for accessibility, persisting preference in localStorage
+  3. Add scroll-spy to highlight the current day in the sidebar based on scroll position within long day pages
+  4. Add per-track reading time in the tier section headers (Beginner: X min, Intermediate: Y min, Advanced: Z min)
+  5. Add a "next/prev" floating action button on mobile for thumb-friendly day navigation
+  6. Consider adding keyboard shortcut for "Jump to Day" dropdown (e.g., J key opens the select)

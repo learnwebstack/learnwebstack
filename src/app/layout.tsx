@@ -48,11 +48,20 @@ export const metadata: Metadata = {
     siteName,
     title: siteName,
     description: `Comprehensive ${courseStats.totalDays}-day full stack web development course with ${courseStats.totalSections}+ sections of structured notes.`,
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1344,
+        height: 768,
+        alt: "Full Stack Web Development — Complete Course Notes",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: siteName,
     description: `Comprehensive ${courseStats.totalDays}-day full stack web development course notes.`,
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,

@@ -44,10 +44,24 @@ export function getAdjacentDays(day: number): {
   };
 }
 
+function estimateReadingMinutes(day: DayContent): number {
+  let wordCount = day.description.split(/\s+/).length;
+  for (const section of day.sections) {
+    for (const p of section.paragraphs || []) {
+      wordCount += p.split(/\s+/).length;
+    }
+    for (const c of section.code || []) {
+      wordCount += c.code.split(/\s+/).length * 0.5; // code reads slower
+    }
+  }
+  return Math.max(1, Math.round(wordCount / 200));
+}
+
 export const courseStats = {
   totalDays: allDays.length,
   totalSections: allDays.reduce((sum, d) => sum + d.sections.length, 0),
   totalTopics: allDays.reduce((sum, d) => sum + d.topics.length, 0),
   totalExercises: allDays.reduce((sum, d) => sum + d.exercises.length, 0),
+  totalReadingMinutes: allDays.reduce((sum, d) => sum + estimateReadingMinutes(d), 0),
   categories: [...new Set(allDays.map((d) => d.category))],
 };

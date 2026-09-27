@@ -207,12 +207,17 @@ export function HomePage({
           </div>
 
           {/* Stats grid */}
-          <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             {[
               { icon: BookOpen, label: "Days", value: courseStats.totalDays },
               { icon: Layers, label: "Sections", value: courseStats.totalSections },
               { icon: Target, label: "Topics", value: courseStats.totalTopics },
               { icon: FileCode, label: "Exercises", value: courseStats.totalExercises },
+              {
+                icon: Clock,
+                label: "Reading Time",
+                value: `${Math.round(courseStats.totalReadingMinutes / 60)}h`,
+              },
             ].map((stat, i) => (
               <Card
                 key={i}
