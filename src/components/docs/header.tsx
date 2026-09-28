@@ -83,7 +83,7 @@ export function Header({
             asChild
           >
             <a
-              href="https://github.com/akram6t/learnwebstack"
+              href="https://github.com/akram6t"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="GitHub"
