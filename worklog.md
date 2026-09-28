@@ -859,3 +859,47 @@ User requested: (1) remove font increase/decrease icon from navbar, (2) remove k
 - To deploy to Vercel: import the repo at vercel.com/new, no env vars required
 - The actual uploaded days.zip (teacher's PDF notes) remains unavailable; site uses comprehensive sample content that can be replaced
 - Author name "Ketan Kore" remains intentionally absent per user request
+
+---
+Task ID: USER-5
+Agent: Z.ai Code
+Task: Switch from SQLite to PostgreSQL (Neon database)
+
+## Current Project Status Description / Assessment
+User provided a Neon PostgreSQL connection string and requested switching from SQLite to PostgreSQL. The project had a scaffolded Prisma schema with SQLite provider and placeholder User/Post models (not actively used by the documentation site, but configured for future use).
+
+## Current Goals / Completed Modifications / Verification Results
+
+### Changes Made
+1. **Prisma schema updated** (`prisma/schema.prisma`): Changed `provider` from `"sqlite"` to `"postgresql"`
+2. **`.env` updated**: Set `DATABASE_URL` to the Neon PostgreSQL connection string (with `sslmode=require`)
+3. **`.env` removed from git tracking**: `git rm --cached .env` — the `.env` file with credentials is no longer tracked by git (security fix)
+4. **`.env.example` created**: Placeholder file with `postgresql://username:password@host/database?sslmode=require` for documentation
+5. **`.gitignore` updated**: Added `!.env.example` exception so the example file is committed but the real `.env` is ignored
+6. **`package.json` scripts fixed**: All `db:*` scripts now use `unset DATABASE_URL && npx prisma ...` to clear a stale system env var (inherited from the dev environment) that was overriding the `.env` file value
+7. **Schema pushed to Neon**: `bun run db:push` successfully created the `User` and `Post` tables in the Neon PostgreSQL database
+8. **Prisma client regenerated**: `bun run db:generate` generated the PostgreSQL-compatible Prisma client
+
+### Security
+- The `.env` file with PostgreSQL credentials was NEVER committed to git history (only the old SQLite `.env` was in history, which has no sensitive credentials)
+- The `.env` is now properly gitignored and removed from tracking
+- The `.env.example` provides documentation without exposing credentials
+- The GitHub token was temporarily added to the remote for push and immediately removed after
+
+### Root Cause of Initial Failure
+The dev environment had a stale system environment variable `DATABASE_URL=file:/home/z/my-project/db/custom.db` (from the original SQLite setup) that was inherited by child processes and overrode the `.env` file value. Prisma's dotenv loader does not override existing env vars. Fixed by prepending `unset DATABASE_URL` to all db scripts.
+
+### Verification Results
+- ESLint: 0 errors ✓
+- All routes return 200: /, /?day=1, /?day=7 ✓
+- `bun run db:push`: "Your database is now in sync with your Prisma schema" ✓
+- `bun run db:generate`: "Generated Prisma Client (v6.19.2)" ✓
+- Git status: clean (all changes committed and pushed) ✓
+- `.env` is gitignored and not tracked ✓
+- Pushed to GitHub: learnwebstack/learnwebstack (commit 1d46e79) ✓
+
+## Unresolved Issues or Risks / Priority Recommendations for Next Phase
+- **No unresolved bugs** — PostgreSQL is configured and working
+- For Vercel deployment: set the `DATABASE_URL` environment variable in the Vercel project settings (it won't be in the repo since .env is gitignored)
+- The stale system `DATABASE_URL` env var in the dev environment may persist across sessions; the `unset` in package.json scripts handles this for Prisma commands, but if the Next.js app uses the database in the future, it may need the correct env var set at the system level or in the Vercel dashboard
+- The documentation site currently doesn't use the database (all state is client-side localStorage); the Prisma models are ready for future server-side features (user accounts, saved progress server-side, etc.)
